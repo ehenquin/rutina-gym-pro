@@ -51,6 +51,59 @@
   </div>
 -->
 
+  <div id="login-screen" style="padding:28px 18px; max-width:420px; margin:0 auto;">
+
+    <h2 style="margin-bottom:8px;">Rutina Gym</h2>
+    <p id="auth-message" style="min-height:20px; font-size:14px; margin:0 0 14px 0; color:#555;"></p>
+
+    <div id="login-form">
+      <input id="login-phone" placeholder="Telefono" autocomplete="tel"
+        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
+
+      <input id="login-password" type="password" placeholder="Password" autocomplete="current-password"
+        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
+
+      <button id="btn-login" type="button" style="width:100%; padding:12px; margin-top:15px; font-weight:700;">
+        Ingresar
+      </button>
+
+      <button id="btn-show-register" type="button"
+        style="width:100%; padding:10px; margin-top:10px; background:transparent; border:0; text-decoration:underline;">
+        Crear cuenta
+      </button>
+    </div>
+
+    <div id="register-form" style="display:none;">
+      <input id="register-name" placeholder="Nombre" autocomplete="given-name"
+        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
+
+      <input id="register-lastname" placeholder="Apellido" autocomplete="family-name"
+        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
+
+      <input id="register-mail" type="email" placeholder="Mail" autocomplete="email"
+        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
+
+      <input id="register-phone" placeholder="Telefono" autocomplete="tel"
+        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
+
+      <input id="register-password" type="password" placeholder="Password" autocomplete="new-password"
+        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
+
+      <input id="register-password-confirm" type="password" placeholder="Confirmar password" autocomplete="new-password"
+        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
+
+      <button id="btn-register" type="button" style="width:100%; padding:12px; margin-top:15px; font-weight:700;">
+        Registrarme
+      </button>
+
+      <button id="btn-show-login" type="button"
+        style="width:100%; padding:10px; margin-top:10px; background:transparent; border:0; text-decoration:underline;">
+        Ya tengo cuenta
+      </button>
+    </div>
+
+  </div>
+
 
 
 
@@ -155,6 +208,22 @@
     <!-- =============================================== -->
     <!-- SELECTOR DE SEMANAS -->
     <!-- =============================================== -->
+
+
+    <!-- =============================================== -->
+    <!-- MENSAJE COMERCIAL TESTER -->
+    <!-- =============================================== -->
+    <div class="comercial-banner">
+      <p>PARA SEGUIR DE MANERA DETALLADA TU EVOLUCIÓN EN LAS RUTINAS DE ENTRENAMIENTO...</p>
+      <p class="highlight">CONSULTAR CON TU ENTRENADOR</p>
+      <p>¿TE GUSTARÍA / QUISIERAS MEJORAR? INFORMÁLE A TU ENTRENADOR</p>
+    </div>
+    <!-- =============================================== -->
+    <!-- SELECTOR DE SEMANAS -->
+    <!-- =============================================== -->
+
+
+
 
     <nav class="week-selector" id="week-tabs">
       <!-- generado por JS -->
@@ -426,6 +495,31 @@
     </main>
   </div>
 
+
+
+
+
+
+
+
+  <!-- ================================================= -->
+  <!-- PANTALLA DE BLOQUEO TESTER (FRONTE END)           -->
+  <!-- ================================================= -->
+  <div id="tester-lock-screen"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); color:white; z-index:99999; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px;">
+    <h2 style="color:#ff3b30; margin-bottom:15px; font-size:24px;">TIEMPO DE PRUEBA FINALIZADO</h2>
+    <p style="font-size:16px; margin-bottom:10px;">Esta versión de demostración ha caducado (2 días de prueba
+      cumplidos).</p>
+    <p style="font-size:16px; font-weight:bold; color:#007aff;">Consultá con tu entrenador para acceder a la versión
+      completa.</p>
+  </div>
+
+
+
+
+
+
+
   <!-- ================================================= -->
   <!-- SCRIPT PRINCIPAL -->
   <!-- ================================================= -->
@@ -461,6 +555,7 @@
 
 
 
+  <script src="config.js"></script>
   <script src="app.js"></script>
 
 
