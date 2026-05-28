@@ -66,6 +66,61 @@ header {
     cursor: pointer;
 }
 
+
+
+
+
+
+
+/* ========================================= */
+/* BANNER COMERCIAL TESTER                   */
+/* ========================================= */
+.comercial-banner {
+    background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+    margin: 12px 16px;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comercial-banner p {
+    color: #e5e5ea;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+    line-height: 1.3;
+}
+
+.comercial-banner p:last-child {
+    margin-bottom: 0;
+    font-size: 0.75rem;
+    color: #aeaeb2;
+}
+
+.comercial-banner .highlight {
+    color: #34c759;
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 8px 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Tabs */
 .week-selector {
 
