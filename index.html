@@ -1,31 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
+  <head>
+    <!-- CONFIGURACIÓN BÁSICA -->
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
 
-<head>
+    <title>Rutina Gym</title>
 
-  <!-- CONFIGURACIÓN BÁSICA -->
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- ESTILOS -->
+    <link rel="stylesheet" href="styles.css" />
 
-  <title>Rutina Gym</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#22c55e" />
+  </head>
 
-  <!-- ESTILOS -->
-  <link rel="stylesheet" href="styles.css">
+  <body>
+    <!-- ================================================= -->
+    <!-- PANTALLA DE LOGIN -->
+    <!-- ================================================= -->
 
-</head>
-
-
-<body>
-
-
-
-  <!-- ================================================= -->
-  <!-- PANTALLA DE LOGIN -->
-  <!-- ================================================= -->
-
-
-  <!-- MODO TESTER: Comentar bloque de login -->
-  <!--
+    <!-- MODO TESTER: Comentar bloque de login -->
+    <!--
   
   <div id="login-screen" style="padding:40px; max-width:400px; margin:auto;">
 
@@ -51,514 +49,579 @@
   </div>
 -->
 
-  <div id="login-screen" style="padding:28px 18px; max-width:420px; margin:0 auto;">
+    <div
+      id="login-screen"
+      style="padding: 28px 18px; max-width: 420px; margin: 0 auto"
+    >
+      <h2 style="margin-bottom: 8px">Rutina Gym</h2>
+      <p
+        id="auth-message"
+        style="
+          min-height: 20px;
+          font-size: 14px;
+          margin: 0 0 14px 0;
+          color: #555;
+        "
+      ></p>
 
-    <h2 style="margin-bottom:8px;">Rutina Gym</h2>
-    <p id="auth-message" style="min-height:20px; font-size:14px; margin:0 0 14px 0; color:#555;"></p>
+      <div id="login-form">
+        <input
+          id="login-phone"
+          placeholder="Telefono"
+          autocomplete="tel"
+          style="
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            box-sizing: border-box;
+          "
+        />
 
-    <div id="login-form">
-      <input id="login-phone" placeholder="Telefono" autocomplete="tel"
-        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
+        <input
+          id="login-password"
+          type="password"
+          placeholder="Password"
+          autocomplete="current-password"
+          style="
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            box-sizing: border-box;
+          "
+        />
 
-      <input id="login-password" type="password" placeholder="Password" autocomplete="current-password"
-        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
-
-      <button id="btn-login" type="button" style="width:100%; padding:12px; margin-top:15px; font-weight:700;">
-        Ingresar
-      </button>
-
-      <button id="btn-show-register" type="button"
-        style="width:100%; padding:10px; margin-top:10px; background:transparent; border:0; text-decoration:underline;">
-        Crear cuenta
-      </button>
-    </div>
-
-    <div id="register-form" style="display:none;">
-      <input id="register-name" placeholder="Nombre" autocomplete="given-name"
-        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
-
-      <input id="register-lastname" placeholder="Apellido" autocomplete="family-name"
-        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
-
-      <input id="register-mail" type="email" placeholder="Mail" autocomplete="email"
-        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
-
-      <input id="register-phone" placeholder="Telefono" autocomplete="tel"
-        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
-
-      <input id="register-password" type="password" placeholder="Password" autocomplete="new-password"
-        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
-
-      <input id="register-password-confirm" type="password" placeholder="Confirmar password" autocomplete="new-password"
-        style="width:100%; padding:12px; margin-top:10px; box-sizing:border-box;">
-
-      <button id="btn-register" type="button" style="width:100%; padding:12px; margin-top:15px; font-weight:700;">
-        Registrarme
-      </button>
-
-      <button id="btn-show-login" type="button"
-        style="width:100%; padding:10px; margin-top:10px; background:transparent; border:0; text-decoration:underline;">
-        Ya tengo cuenta
-      </button>
-    </div>
-
-  </div>
-
-
-
-
-  <!-- ================================================= -->
-  <!-- CONTENEDOR PRINCIPAL DE LA APP -->
-  <!-- ================================================= -->
-
-  <div id="app-container" style="display:none;">
-
-
-
-    <!-- =============================================== -->
-    <!-- HEADER -->
-    <!-- =============================================== -->
-
-    <header>
-
-      <div class="header-main">
-
-        <h1>Rutina Gym</h1>
-
-        <span id="last-saved">
-          Guardado: --:--
-        </span>
-
-      </div>
-
-
-
-      <!-- CONTROLES SUPERIORES -->
-      <div class="header-controls">
-
-        <!-- DÍAS RESTANTES -->
-        <span id="dias-restantes" style="
-          font-size:12px;
-          font-weight:600;
-          margin-right:10px;
-          color:#444;
-        "></span>
-
-
-
-        <!-- BOTÓN WHATSAPP -->
-        <button id="btn-share-wa" class="btn-whatsapp" type="button">
-          Mandar RUTINA x WhatsApp
+        <button
+          id="btn-login"
+          type="button"
+          style="width: 100%; padding: 12px; margin-top: 15px; font-weight: 700"
+        >
+          Ingresar
         </button>
 
-        <!-- BOTÓN MENÚ / MÁS -->
-        <button id="btn-main-menu" class="btn-menu" type="button">
-          ☰ MÁs
+        <button
+          id="btn-show-register"
+          type="button"
+          style="
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: transparent;
+            border: 0;
+            text-decoration: underline;
+          "
+        >
+          Crear cuenta
+        </button>
+      </div>
+
+      <div id="register-form" style="display: none">
+        <input
+          id="register-name"
+          placeholder="Nombre"
+          autocomplete="given-name"
+          style="
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            box-sizing: border-box;
+          "
+        />
+
+        <input
+          id="register-lastname"
+          placeholder="Apellido"
+          autocomplete="family-name"
+          style="
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            box-sizing: border-box;
+          "
+        />
+
+        <input
+          id="register-mail"
+          type="email"
+          placeholder="Mail"
+          autocomplete="email"
+          style="
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            box-sizing: border-box;
+          "
+        />
+
+        <input
+          id="register-phone"
+          placeholder="Telefono"
+          autocomplete="tel"
+          style="
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            box-sizing: border-box;
+          "
+        />
+
+        <input
+          id="register-password"
+          type="password"
+          placeholder="Password"
+          autocomplete="new-password"
+          style="
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            box-sizing: border-box;
+          "
+        />
+
+        <input
+          id="register-password-confirm"
+          type="password"
+          placeholder="Confirmar password"
+          autocomplete="new-password"
+          style="
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            box-sizing: border-box;
+          "
+        />
+
+        <button
+          id="btn-register"
+          type="button"
+          style="width: 100%; padding: 12px; margin-top: 15px; font-weight: 700"
+        >
+          Registrarme
         </button>
 
-
-
-
-
-
-        <!-- BOTÓN PLAN PRO -->
-        <button id="btn-plan" class="btn-plan" type="button">
-          Activar PRO
+        <button
+          id="btn-show-login"
+          type="button"
+          style="
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: transparent;
+            border: 0;
+            text-decoration: underline;
+          "
+        >
+          Ya tengo cuenta
         </button>
-
-      </div>
-
-    </header>
-
-
-
-
-
-    <!-- =============================================== -->
-    <!-- MENÚ PRINCIPAL DESPLEGABLE                      -->
-    <!-- =============================================== -->
-    <div id="main-menu-overlay" class="menu-overlay" style="display:none;">
-      <div class="menu-content">
-        <div class="menu-header">
-          <h2>Menú</h2>
-          <button id="btn-close-menu" class="btn-close-menu" type="button">✖</button>
-        </div>
-        <div class="menu-items">
-          <!-- BOTÓN PESO CORPORAL (MOVIDO AQUÍ) -->
-          <button id="btn-weight-module" class="menu-item-btn" type="button">
-            Peso Corporal
-          </button>
-
-          <!-- BOTÓN PROGRESO DE EJERCICIOS -->
-          <button id="btn-progress-module" class="menu-item-btn" type="button">
-            Progreso de Ejercicios
-          </button>
-        </div>
       </div>
     </div>
 
+    <!-- ================================================= -->
+    <!-- CONTENEDOR PRINCIPAL DE LA APP -->
+    <!-- ================================================= -->
 
+    <div id="app-container" style="display: none">
+      <!-- =============================================== -->
+      <!-- HEADER -->
+      <!-- =============================================== -->
 
+      <header>
+        <div class="header-main">
+          <h1>Rutina Gym</h1>
 
-
-
-
-
-    <!-- =============================================== -->
-    <!-- SELECTOR DE SEMANAS -->
-    <!-- =============================================== -->
-
-
-    <!-- =============================================== -->
-    <!-- MENSAJE COMERCIAL TESTER -->
-    <!-- =============================================== -->
-    <div class="comercial-banner">
-      <p>PARA SEGUIR DE MANERA DETALLADA TU EVOLUCIÓN EN LAS RUTINAS DE ENTRENAMIENTO...</p>
-      <p class="highlight">CONSULTAR CON TU ENTRENADOR</p>
-      <p>¿TE GUSTARÍA / QUISIERAS MEJORAR? INFORMÁLE A TU ENTRENADOR</p>
-    </div>
-    <!-- =============================================== -->
-    <!-- SELECTOR DE SEMANAS -->
-    <!-- =============================================== -->
-
-
-
-
-    <nav class="week-selector" id="week-tabs">
-      <!-- generado por JS -->
-    </nav>
-
-
-
-    <!-- BOTÓN AGREGAR SEMANA -->
-    <div style="padding:0 16px 12px 16px;">
-
-      <button id="btn-add-week" type="button" style="
-        width:100%;
-        padding:10px;
-        border-radius:10px;
-        border:1px dashed #ccc;
-        background:#f9f9f9;
-        font-weight:600;
-        cursor:pointer;
-        font-size:0.85rem;
-      ">
-        + Agregar Semana
-      </button>
-
-    </div>
-
-
-
-    <!-- =============================================== -->
-    <!-- CONTENIDO PRINCIPAL -->
-    <!-- =============================================== -->
-
-    <main>
-
-
-
-      <!-- INFO SEMANA -->
-      <div class="week-info">
-
-        <h2 id="current-week-label">
-          Semana 1
-        </h2>
-
-
-
-        <div style="display:flex; gap:8px;">
-
-          <!-- DUPLICAR SEMANA -->
-          <button id="btn-duplicate-week" type="button" style="
-            border:1px solid #ccc;
-            padding:6px 10px;
-            border-radius:6px;
-            background:white;
-            cursor:pointer;
-            font-size:0.8rem;
-            font-weight:600;
-          ">
-            Duplicar Semana
-          </button>
-
-
-
-          <!-- REINICIAR SEMANA -->
-          <button id="btn-reset-week" class="btn-danger" type="button">
-            Reiniciar Semana
-          </button>
-
+          <span id="last-saved"> Guardado: --:-- </span>
         </div>
 
+        <!-- CONTROLES SUPERIORES -->
+        <div class="header-controls">
+          <!-- DÍAS RESTANTES -->
+          <span
+            id="dias-restantes"
+            style="
+              font-size: 12px;
+              font-weight: 600;
+              margin-right: 10px;
+              color: #444;
+            "
+          ></span>
+
+          <!-- BOTÓN WHATSAPP -->
+          <button id="btn-share-wa" class="btn-whatsapp" type="button">
+            Mandar RUTINA x WhatsApp
+          </button>
+
+          <!-- BOTÓN MENÚ / MÁS -->
+          <button id="btn-main-menu" class="btn-menu" type="button">
+            ☰ MÁs
+          </button>
+
+          <!-- BOTÓN PLAN PRO -->
+          <button id="btn-plan" class="btn-plan" type="button">
+            Activar PRO
+          </button>
+        </div>
+      </header>
+
+      <!-- =============================================== -->
+      <!-- MENÚ PRINCIPAL DESPLEGABLE                      -->
+      <!-- =============================================== -->
+      <div id="main-menu-overlay" class="menu-overlay" style="display: none">
+        <div class="menu-content">
+          <div class="menu-header">
+            <h2>Menú</h2>
+            <button id="btn-close-menu" class="btn-close-menu" type="button">
+              ✖
+            </button>
+          </div>
+          <div class="menu-items">
+            <!-- BOTÓN PESO CORPORAL (MOVIDO AQUÍ) -->
+            <button id="btn-weight-module" class="menu-item-btn" type="button">
+              Peso Corporal
+            </button>
+
+            <!-- BOTÓN PROGRESO DE EJERCICIOS -->
+            <button
+              id="btn-progress-module"
+              class="menu-item-btn"
+              type="button"
+            >
+              Progreso de Ejercicios
+            </button>
+          </div>
+        </div>
       </div>
 
+      <!-- =============================================== -->
+      <!-- SELECTOR DE SEMANAS -->
+      <!-- =============================================== -->
 
+      <!-- =============================================== -->
+      <!-- MENSAJE COMERCIAL TESTER -->
+      <!-- =============================================== -->
+      <div class="comercial-banner">
+        <p>
+          PARA SEGUIR DE MANERA DETALLADA TU EVOLUCIÓN EN LAS RUTINAS DE
+          ENTRENAMIENTO...
+        </p>
+        <p class="highlight">CONSULTAR CON TU ENTRENADOR</p>
+        <p>¿TE GUSTARÍA / QUISIERAS MEJORAR? INFORMÁLE A TU ENTRENADOR</p>
+      </div>
+      <!-- =============================================== -->
+      <!-- SELECTOR DE SEMANAS -->
+      <!-- =============================================== -->
 
-      <!-- ACORDEÓN DE DÍAS -->
-      <div id="days-accordion" class="accordion">
+      <nav class="week-selector" id="week-tabs">
         <!-- generado por JS -->
-      </div>
+      </nav>
 
-
-
-      <!-- BOTÓN AGREGAR DÍA -->
-      <div style="padding:16px;">
-
-        <button id="btn-add-day" type="button" style="
-          width:100%;
-          padding:12px;
-          border-radius:10px;
-          border:1px dashed #ccc;
-          background:#f9f9f9;
-          font-weight:600;
-          cursor:pointer;
-        ">
-          + Agregar DÍa
+      <!-- BOTÓN AGREGAR SEMANA -->
+      <div style="padding: 0 16px 12px 16px">
+        <button
+          id="btn-add-week"
+          type="button"
+          style="
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px dashed #ccc;
+            background: #f9f9f9;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+          "
+        >
+          + Agregar Semana
         </button>
-
       </div>
 
+      <!-- =============================================== -->
+      <!-- CONTENIDO PRINCIPAL -->
+      <!-- =============================================== -->
 
+      <main>
+        <!-- INFO SEMANA -->
+        <div class="week-info">
+          <h2 id="current-week-label">Semana 1</h2>
 
-    </main>
+          <div style="display: flex; gap: 8px">
+            <!-- DUPLICAR SEMANA -->
+            <button
+              id="btn-duplicate-week"
+              type="button"
+              style="
+                border: 1px solid #ccc;
+                padding: 6px 10px;
+                border-radius: 6px;
+                background: white;
+                cursor: pointer;
+                font-size: 0.8rem;
+                font-weight: 600;
+              "
+            >
+              Duplicar Semana
+            </button>
 
+            <!-- REINICIAR SEMANA -->
+            <button id="btn-reset-week" class="btn-danger" type="button">
+              Reiniciar Semana
+            </button>
+          </div>
+        </div>
 
+        <!-- ACORDEÓN DE DÍAS -->
+        <div id="days-accordion" class="accordion">
+          <!-- generado por JS -->
+        </div>
 
-  </div>
-
-
-
-  <!-- ================================================= -->
-  <!-- MODAL PLAN PRO -->
-  <!-- ================================================= -->
-
-  <div id="plan-modal" class="modal" style="display:none">
-
-    <div class="modal-content">
-
-      <h2>Plan PRO</h2>
-
-      <p>
-        Acceso completo a Rutina Gym
-      </p>
-
-      <h3>$5000 / mes</h3>
-
-      <p>Alias para transferencia</p>
-
-      <div class="alias-box">
-        rutina.gym.pro
-      </div>
-
-      <input id="alias-cliente" placeholder="Alias desde donde transferiste"
-        style="width:100%;padding:10px;margin-top:10px;border-radius:8px;border:1px solid #ccc" />
-
-
-      <button id="btn-transferido">
-        Ya transferí y te mando comprobante
-      </button>
-
-      <button id="btn-cerrar-plan">
-        Cerrar
-      </button>
-
+        <!-- BOTÓN AGREGAR DÍA -->
+        <div style="padding: 16px">
+          <button
+            id="btn-add-day"
+            type="button"
+            style="
+              width: 100%;
+              padding: 12px;
+              border-radius: 10px;
+              border: 1px dashed #ccc;
+              background: #f9f9f9;
+              font-weight: 600;
+              cursor: pointer;
+            "
+          >
+            + Agregar DÍa
+          </button>
+        </div>
+      </main>
     </div>
 
-  </div>
+    <!-- ================================================= -->
+    <!-- MODAL PLAN PRO -->
+    <!-- ================================================= -->
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <div id="plan-modal" class="modal" style="display: none">
+      <div class="modal-content">
+        <h2>Plan PRO</h2>
 
-  <!-- ================================================= -->
-  <!-- TEMPLATE BOTON ELIMINAR EJERCICIO -->
-  <!-- Se inserta dinÁmicamente dentro de cada ejercicio -->
-  <!-- ================================================= -->
+        <p>Acceso completo a Rutina Gym</p>
 
-  <template id="tpl-delete-exercise">
+        <h3>$5000 / mes</h3>
 
-    <!--
+        <p>Alias para transferencia</p>
+
+        <div class="alias-box">rutina.gym.pro</div>
+
+        <input
+          id="alias-cliente"
+          placeholder="Alias desde donde transferiste"
+          style="
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+          "
+        />
+
+        <button id="btn-transferido">
+          Ya transferí y te mando comprobante
+        </button>
+
+        <button id="btn-cerrar-plan">Cerrar</button>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- ================================================= -->
+    <!-- TEMPLATE BOTON ELIMINAR EJERCICIO -->
+    <!-- Se inserta dinÁmicamente dentro de cada ejercicio -->
+    <!-- ================================================= -->
+
+    <template id="tpl-delete-exercise">
+      <!--
     Esta es la X roja que aparece en cada ejercicio.
     El JS la clona cuando crea la fila del ejercicio.
   -->
 
-    <button class="delete-exercise" type="button">
-      ✖
-    </button>
+      <button class="delete-exercise" type="button">✖</button>
+    </template>
 
-  </template>
+    <!-- ================================================= -->
+    <!-- MÓDULO CONTROL DE PESO CORPORAL                   -->
+    <!-- ================================================= -->
+    <div id="weight-container" class="weight-view" style="display: none">
+      <header class="weight-header">
+        <button id="btn-close-weight" class="btn-back" type="button">
+          ← Volver
+        </button>
+        <h2>Control de Peso</h2>
+      </header>
 
-
-
-
-  <!-- ================================================= -->
-  <!-- MÓDULO CONTROL DE PESO CORPORAL                   -->
-  <!-- ================================================= -->
-  <div id="weight-container" class="weight-view" style="display:none;">
-
-    <header class="weight-header">
-      <button id="btn-close-weight" class="btn-back" type="button">← Volver</button>
-      <h2>Control de Peso</h2>
-    </header>
-
-    <main class="weight-main">
-      <!-- Tarjeta para ingresar registro -->
-      <div class="weight-card">
-        <h3>Registrar Peso</h3>
-        <div class="weight-form">
-          <input type="date" id="weight-date" class="weight-input">
-          <input type="number" id="weight-value" step="0.1" inputmode="decimal" placeholder="Ej: 75.5"
-            class="weight-input">
-          <button id="btn-add-weight" class="btn-save-weight" type="button">Guardar</button>
+      <main class="weight-main">
+        <!-- Tarjeta para ingresar registro -->
+        <div class="weight-card">
+          <h3>Registrar Peso</h3>
+          <div class="weight-form">
+            <input type="date" id="weight-date" class="weight-input" />
+            <input
+              type="number"
+              id="weight-value"
+              step="0.1"
+              inputmode="decimal"
+              placeholder="Ej: 75.5"
+              class="weight-input"
+            />
+            <button id="btn-add-weight" class="btn-save-weight" type="button">
+              Guardar
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Tarjeta del grÁfico -->
-      <div class="weight-card">
-        <h3>EvoluciÓn</h3>
-        <canvas id="weight-chart" width="320" height="150" style="width:100%; display:block;"></canvas>
-      </div>
+        <!-- Tarjeta del grÁfico -->
+        <div class="weight-card">
+          <h3>EvoluciÓn</h3>
+          <canvas
+            id="weight-chart"
+            width="320"
+            height="150"
+            style="width: 100%; display: block"
+          ></canvas>
+        </div>
 
-      <!-- Tarjeta de la tabla -->
-      <div class="weight-card">
-        <h3>Historial</h3>
-        <table class="weight-table">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Peso (kg)</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="weight-table-body">
-            <!-- Renderizado dinÁmico -->
-          </tbody>
-        </table>
-      </div>
-    </main>
-  </div>
+        <!-- Tarjeta de la tabla -->
+        <div class="weight-card">
+          <h3>Historial</h3>
+          <table class="weight-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Peso (kg)</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="weight-table-body">
+              <!-- Renderizado dinÁmico -->
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
 
+    <!-- ================================================= -->
+    <!-- MÓDULO PROGRESO DE EJERCICIOS                     -->
+    <!-- ================================================= -->
+    <div id="progress-container" class="progress-view" style="display: none">
+      <header class="progress-header">
+        <button id="btn-close-progress" class="btn-back" type="button">
+          ← Volver
+        </button>
+        <h2>Progreso de Ejercicios</h2>
+      </header>
 
+      <main class="progress-main">
+        <!-- Tarjeta para ingresar registro -->
+        <div class="progress-card">
+          <h3>Registrar Avance</h3>
+          <div class="progress-form-col">
+            <input type="date" id="progress-date" class="progress-input" />
+            <select id="progress-exercise-select" class="progress-input">
+              <option value="">Selecciona Ejercicio...</option>
+            </select>
+            <input
+              type="number"
+              id="progress-value"
+              step="0.1"
+              inputmode="decimal"
+              placeholder="Peso (Ej: 60.5)"
+              class="progress-input"
+            />
+            <button
+              id="btn-add-progress"
+              class="btn-save-progress"
+              type="button"
+            >
+              Guardar
+            </button>
+          </div>
+        </div>
 
-  <!-- ================================================= -->
-  <!-- MÓDULO PROGRESO DE EJERCICIOS                     -->
-  <!-- ================================================= -->
-  <div id="progress-container" class="progress-view" style="display:none;">
-
-    <header class="progress-header">
-      <button id="btn-close-progress" class="btn-back" type="button">← Volver</button>
-      <h2>Progreso de Ejercicios</h2>
-    </header>
-
-    <main class="progress-main">
-      <!-- Tarjeta para ingresar registro -->
-      <div class="progress-card">
-        <h3>Registrar Avance</h3>
-        <div class="progress-form-col">
-          <input type="date" id="progress-date" class="progress-input">
-          <select id="progress-exercise-select" class="progress-input">
-            <option value="">Selecciona Ejercicio...</option>
+        <!-- Selector para filtrar grÁfica y tabla -->
+        <div class="progress-card">
+          <h3>Ver EvoluciÓn por Ejercicio</h3>
+          <select
+            id="progress-filter-select"
+            class="progress-input"
+            style="margin-bottom: 12px"
+          >
+            <option value="">Todos los registros</option>
           </select>
-          <input type="number" id="progress-value" step="0.1" inputmode="decimal" placeholder="Peso (Ej: 60.5)"
-            class="progress-input">
-          <button id="btn-add-progress" class="btn-save-progress" type="button">Guardar</button>
+          <canvas
+            id="progress-chart"
+            width="320"
+            height="150"
+            style="width: 100%; display: block"
+          ></canvas>
         </div>
-      </div>
 
-      <!-- Selector para filtrar grÁfica y tabla -->
-      <div class="progress-card">
-        <h3>Ver EvoluciÓn por Ejercicio</h3>
-        <select id="progress-filter-select" class="progress-input" style="margin-bottom: 12px;">
-          <option value="">Todos los registros</option>
-        </select>
-        <canvas id="progress-chart" width="320" height="150" style="width:100%; display:block;"></canvas>
-      </div>
+        <!-- Tarjeta de la tabla -->
+        <div class="progress-card">
+          <h3>Historial</h3>
+          <table class="progress-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Ejercicio</th>
+                <th>Peso (kg)</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="progress-table-body">
+              <!-- Renderizado dinÁmico -->
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
 
-      <!-- Tarjeta de la tabla -->
-      <div class="progress-card">
-        <h3>Historial</h3>
-        <table class="progress-table">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Ejercicio</th>
-              <th>Peso (kg)</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="progress-table-body">
-            <!-- Renderizado dinÁmico -->
-          </tbody>
-        </table>
-      </div>
-    </main>
-  </div>
+    <!-- ================================================= -->
+    <!-- PANTALLA DE BLOQUEO TESTER (FRONTE END)           -->
+    <!-- ================================================= -->
+    <div
+      id="tester-lock-screen"
+      style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.95);
+        color: white;
+        z-index: 99999;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+      "
+    >
+      <h2 style="color: #ff3b30; margin-bottom: 15px; font-size: 24px">
+        TIEMPO DE PRUEBA FINALIZADO
+      </h2>
+      <p style="font-size: 16px; margin-bottom: 10px">
+        Esta versiÓn de demostraciÓn ha caducado (2 dÍas de prueba cumplidos).
+      </p>
+      <p style="font-size: 16px; font-weight: bold; color: #007aff">
+        ConsultÁ con tu entrenador para acceder a la versiÓn completa.
+      </p>
+    </div>
 
+    <!-- ================================================= -->
+    <!-- SCRIPT PRINCIPAL -->
+    <!-- ================================================= -->
 
+    <!-- ================================================= -->
+    <!-- SCRIPT PRINCIPAL -->
+    <!-- ================================================= -->
 
-
-
-
-
-
-  <!-- ================================================= -->
-  <!-- PANTALLA DE BLOQUEO TESTER (FRONTE END)           -->
-  <!-- ================================================= -->
-  <div id="tester-lock-screen"
-    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); color:white; z-index:99999; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px;">
-    <h2 style="color:#ff3b30; margin-bottom:15px; font-size:24px;">TIEMPO DE PRUEBA FINALIZADO</h2>
-    <p style="font-size:16px; margin-bottom:10px;">Esta versiÓn de demostraciÓn ha caducado (2 dÍas de prueba
-      cumplidos).</p>
-    <p style="font-size:16px; font-weight:bold; color:#007aff;">ConsultÁ con tu entrenador para acceder a la versiÓn
-      completa.</p>
-  </div>
-
-
-
-
-
-
-
-  <!-- ================================================= -->
-  <!-- SCRIPT PRINCIPAL -->
-  <!-- ================================================= -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  <!-- ================================================= -->
-  <!-- SCRIPT PRINCIPAL -->
-  <!-- ================================================= -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  <script src="config.js"></script>
-  <script src="app.js"></script>
-
-
-
-</body>
-
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
 </html>
