@@ -1120,6 +1120,14 @@ body {
     box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.14);
 }
 
+.app-pdf-modal-actions {
+    flex-direction: column;
+}
+
+.app-pdf-modal-actions .app-modal-btn {
+    width: 100%;
+}
+
 .app-toast-stack {
     position: fixed;
     left: 14px;
