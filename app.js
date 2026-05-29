@@ -748,6 +748,155 @@ function getFinalCatalog() {
 
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function getExerciseGroup(exerciseName) {
+  const catalog = getFinalCatalog();
+
+  for (const [grupo, items] of Object.entries(catalog)) {
+    if (items.includes(exerciseName)) {
+      return grupo;
+    }
+  }
+
+  return "";
+}
+
+function setExerciseName(dayId, index, exerciseName) {
+  const exercise = state.rutina.semanas[state.currentWeek].dias[dayId].ejercicios[index];
+  exercise.nombre = exerciseName;
+  exercise.grupo = getExerciseGroup(exerciseName);
+  debouncedSave();
+}
+
+function openExercisePicker(options = {}) {
+  const {
+    currentValue = "",
+    onSelect,
+    allowedNames = null,
+    includeClear = false,
+    clearText = "Sin filtro",
+    showCreateActions = false
+  } = options;
+
+  const overlay = document.createElement("div");
+  overlay.className = "exercise-picker-overlay";
+  overlay.innerHTML = `
+    <div class="exercise-picker-panel" role="dialog" aria-modal="true" aria-labelledby="exercise-picker-title">
+      <div class="exercise-picker-header">
+        <h2 id="exercise-picker-title">Elegir ejercicio</h2>
+        <button type="button" class="exercise-picker-close" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <input class="exercise-picker-search" type="search" placeholder="Buscar ejercicio..." autocomplete="off">
+      <div class="exercise-picker-actions"></div>
+      <div class="exercise-picker-list"></div>
+    </div>
+  `;
+
+  const searchInput = overlay.querySelector(".exercise-picker-search");
+  const actionsEl = overlay.querySelector(".exercise-picker-actions");
+  const listEl = overlay.querySelector(".exercise-picker-list");
+  const allowedSet = Array.isArray(allowedNames) ? new Set(allowedNames) : null;
+
+  const closePicker = () => {
+    overlay.classList.remove("is-visible");
+    setTimeout(() => overlay.remove(), 160);
+  };
+
+  const selectExercise = (name) => {
+    if (typeof onSelect === "function") {
+      onSelect(name);
+    }
+    closePicker();
+  };
+
+  const renderList = () => {
+    const query = searchInput.value.trim().toLowerCase();
+    const catalog = getFinalCatalog();
+    let html = "";
+    let total = 0;
+
+    if (includeClear && (!query || clearText.toLowerCase().includes(query))) {
+      html += `
+        <button type="button" class="exercise-picker-option ${!currentValue ? "active" : ""}" data-name="">
+          ${escapeHtml(clearText)}
+        </button>
+      `;
+      total++;
+    }
+
+    Object.entries(catalog).forEach(([grupo, items]) => {
+      const groupMatches = grupo.toLowerCase().includes(query);
+      const filteredItems = items.filter(item => {
+        if (allowedSet && !allowedSet.has(item)) return false;
+        const itemMatches = item.toLowerCase().includes(query);
+        return !query || groupMatches || itemMatches;
+      });
+
+      if (filteredItems.length === 0) return;
+
+      total += filteredItems.length;
+      html += `
+        <div class="exercise-picker-group">
+          <div class="exercise-picker-group-title">${escapeHtml(grupo)}</div>
+          ${filteredItems.map(item => `
+            <button type="button" class="exercise-picker-option ${item === currentValue ? "active" : ""}" data-name="${escapeHtml(item)}">
+              ${escapeHtml(item)}
+            </button>
+          `).join("")}
+        </div>
+      `;
+    });
+
+    listEl.innerHTML = total > 0
+      ? html
+      : `<div class="exercise-picker-empty">No se encontraron ejercicios.</div>`;
+  };
+
+  if (showCreateActions) {
+    actionsEl.innerHTML = `
+      <button type="button" class="exercise-picker-action" data-action="section">+ Crear sección</button>
+      <button type="button" class="exercise-picker-action" data-action="exercise">+ Crear ejercicio</button>
+    `;
+
+    actionsEl.querySelector('[data-action="section"]').addEventListener("click", async () => {
+      const ok = await addNewSectionFlow();
+      if (ok) renderList();
+    });
+
+    actionsEl.querySelector('[data-action="exercise"]').addEventListener("click", async () => {
+      const created = await addNewExerciseFlow();
+      if (created) renderList();
+    });
+  }
+
+  overlay.querySelector(".exercise-picker-close").addEventListener("click", closePicker);
+  overlay.addEventListener("click", event => {
+    if (event.target === overlay) closePicker();
+  });
+  overlay.addEventListener("keydown", event => {
+    if (event.key === "Escape") closePicker();
+  });
+  listEl.addEventListener("click", event => {
+    const option = event.target.closest(".exercise-picker-option");
+    if (!option) return;
+    selectExercise(option.dataset.name || "");
+  });
+  searchInput.addEventListener("input", renderList);
+
+  document.body.appendChild(overlay);
+  renderList();
+  requestAnimationFrame(() => overlay.classList.add("is-visible"));
+  searchInput.focus();
+}
+
 
 // Sistema de licencias antiguo eliminado
 
@@ -1055,6 +1204,9 @@ function createExerciseRow(dayId, index, exercise) {
 
   }
 
+  const exerciseLabel = exercise.nombre || "Seleccionar ejercicio...";
+  const activeClass = exercise.nombre ? "has-value" : "";
+
   row.innerHTML = `
 
         <!-- ===================================================== -->
@@ -1076,9 +1228,11 @@ function createExerciseRow(dayId, index, exercise) {
         <!-- ===================================================== -->
 
         <div class="ex-title-container">
-            <select class="ex-select" onchange="handleExerciseSelect(${dayId}, ${index}, this)">
-                ${optionsHtml}
-            </select>
+            <button class="ex-picker-button ${activeClass}"
+                    type="button"
+                    onclick="openRoutineExercisePicker(${dayId}, ${index})">
+                ${escapeHtml(exerciseLabel)}
+            </button>
         </div>
 
 
@@ -1167,6 +1321,21 @@ window.handleExerciseSelect = async (dayId, index, selectEl) => {
   // Selección normal
   updateEx(dayId, index, "nombre", selectEl);
 
+};
+
+window.openRoutineExercisePicker = (dayId, index) => {
+  const exercise = state.rutina.semanas[state.currentWeek].dias[dayId].ejercicios[index];
+
+  openExercisePicker({
+    currentValue: exercise?.nombre || "",
+    showCreateActions: true,
+    onSelect: (exerciseName) => {
+      if (!exerciseName) return;
+      setExerciseName(dayId, index, exerciseName);
+      renderApp();
+      showAppToast("Ejercicio actualizado", "success");
+    }
+  });
 };
 
 
@@ -2470,6 +2639,70 @@ function renderWeightChart() {
 const PROGRESS_STORAGE_KEY = "gym_progress_v1";
 let progressData = [];
 
+function syncProgressExerciseButtons() {
+  const formSelect = document.getElementById("progress-exercise-select");
+  const filterSelect = document.getElementById("progress-filter-select");
+  const formButton = document.getElementById("progress-exercise-picker-btn");
+  const filterButton = document.getElementById("progress-filter-picker-btn");
+
+  if (formButton && formSelect) {
+    formButton.textContent = formSelect.value || "Selecciona Ejercicio...";
+    formButton.classList.toggle("has-value", Boolean(formSelect.value));
+  }
+
+  if (filterButton && filterSelect) {
+    filterButton.textContent = filterSelect.value || "Todos los registros";
+    filterButton.classList.toggle("has-value", Boolean(filterSelect.value));
+  }
+}
+
+function ensureProgressCustomSelectors() {
+  const formSelect = document.getElementById("progress-exercise-select");
+  const filterSelect = document.getElementById("progress-filter-select");
+
+  if (formSelect && !document.getElementById("progress-exercise-picker-btn")) {
+    const button = document.createElement("button");
+    button.id = "progress-exercise-picker-btn";
+    button.type = "button";
+    button.className = "progress-exercise-picker-btn";
+    button.addEventListener("click", () => {
+      openExercisePicker({
+        currentValue: formSelect.value,
+        onSelect: (exerciseName) => {
+          formSelect.value = exerciseName;
+          syncProgressExerciseButtons();
+        }
+      });
+    });
+    formSelect.insertAdjacentElement("afterend", button);
+  }
+
+  if (filterSelect && !document.getElementById("progress-filter-picker-btn")) {
+    const button = document.createElement("button");
+    button.id = "progress-filter-picker-btn";
+    button.type = "button";
+    button.className = "progress-exercise-picker-btn";
+    button.addEventListener("click", () => {
+      const exercisesWithRecords = [...new Set(progressData.map(r => r.exercise).filter(Boolean))].sort();
+
+      openExercisePicker({
+        currentValue: filterSelect.value,
+        allowedNames: exercisesWithRecords,
+        includeClear: true,
+        clearText: "Todos los registros",
+        onSelect: (exerciseName) => {
+          filterSelect.value = exerciseName;
+          syncProgressExerciseButtons();
+          renderProgressUI();
+        }
+      });
+    });
+    filterSelect.insertAdjacentElement("afterend", button);
+  }
+
+  syncProgressExerciseButtons();
+}
+
 function initProgressModule() {
   loadProgressData();
 
@@ -2493,6 +2726,7 @@ function initProgressModule() {
       document.getElementById('progress-date').value = localISOTime;
 
       loadExerciseSelects();
+      ensureProgressCustomSelectors();
       renderProgressUI();
     });
 
@@ -2560,6 +2794,7 @@ function handleAddProgress() {
   const prevFilter = filterSelect.value;
   loadExerciseSelects();
   filterSelect.value = exInput; // Autofiltrar por el recien agregado (muy útil)
+  syncProgressExerciseButtons();
 
   renderProgressUI();
   showAppToast("Registro agregado", "success");
@@ -2582,6 +2817,7 @@ window.deleteProgressRecord = async (id) => {
   const prevFilter = filterSelect.value;
   loadExerciseSelects();
   filterSelect.value = prevFilter;
+  syncProgressExerciseButtons();
 
   renderProgressUI();
 };
@@ -2623,6 +2859,8 @@ function loadExerciseSelects() {
 
   selectFilter.innerHTML = filterHtml;
   selectFilter.value = ejerciciosConRegistros.includes(prevFilterVal) ? prevFilterVal : "";
+
+  ensureProgressCustomSelectors();
 }
 
 
