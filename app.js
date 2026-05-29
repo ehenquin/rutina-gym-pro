@@ -1315,6 +1315,7 @@ function loadFromStorage() {
 function setupEventListeners() {
 
 
+  document.getElementById('btn-share-wa').textContent = "Generar PDF / WhatsApp";
   document.getElementById('btn-share-wa').onclick = () => {
     generarPDFRutina();
   };
@@ -1813,8 +1814,16 @@ async function consultarEstadoUsuario() {
 
 
 
-function generarPDFRutina() {
-  const { jsPDF } = window.jspdf;
+async function generarPDFRutina() {
+  const fileName = "rutina_gym.pdf";
+
+  try {
+    showAppToast("Generando PDF...", "info");
+
+    const { jsPDF } = window.jspdf || {};
+    if (!jsPDF) {
+      throw new Error("jsPDF no disponible.");
+    }
 
   const doc = new jsPDF({
     orientation: "landscape",
@@ -1822,12 +1831,39 @@ function generarPDFRutina() {
     format: "a4"
   });
 
-  const semanas = state.rutina.semanas;
-  const semKeys = Object.keys(semanas).sort((a, b) => a - b);
+    const semanas = state?.rutina?.semanas || {};
+    const semKeys = Object.keys(semanas).sort((a, b) => Number(a) - Number(b));
+    const pdfSemanas = semKeys.length > 0 ? semKeys : ["1"];
+
+    const getDia = (semanaKey, diaKey) => {
+      const semana = semanas?.[semanaKey] || {};
+      const dias = semana?.dias || {};
+      return dias?.[diaKey] || null;
+    };
+
+    const getEjercicios = (semanaKey, diaKey) => {
+      const dia = getDia(semanaKey, diaKey);
+      return Array.isArray(dia?.ejercicios)
+        ? dia.ejercicios.filter(e => e && typeof e === "object")
+        : [];
+    };
+
+    const toText = (value, fallback) => {
+      if (value === undefined || value === null) return fallback;
+      const text = String(value).trim();
+      return text || fallback;
+    };
+
+    const toRow = (exercise) => [
+      toText(exercise.nombre, "Ejercicio sin nombre"),
+      toText(exercise.series, "-"),
+      toText(exercise.reps, "-"),
+      toText(exercise.peso, "-")
+    ];
 
   const chunks = [];
-  for (let i = 0; i < semKeys.length; i += 4) {
-    chunks.push(semKeys.slice(i, i + 4));
+  for (let i = 0; i < pdfSemanas.length; i += 4) {
+    chunks.push(pdfSemanas.slice(i, i + 4));
   }
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -1873,21 +1909,18 @@ function generarPDFRutina() {
 
       let maxEjercicios = 1;
       chunk.forEach(semana => {
-        const ejercicios = semanas[semana].dias[dia].ejercicios;
-        if (ejercicios && ejercicios.length > maxEjercicios) {
+        const ejercicios = getEjercicios(semana, dia);
+        if (ejercicios.length > maxEjercicios) {
           maxEjercicios = ejercicios.length;
         }
       });
 
       chunk.forEach((semana, index) => {
-        const ejercicios = semanas[semana].dias[dia].ejercicios;
+        const ejercicios = getEjercicios(semana, dia);
 
-        let tabla = ejercicios.map(e => [
-          e.nombre || "",
-          e.series || "",
-          e.reps || "",
-          e.peso || ""
-        ]);
+        let tabla = ejercicios.length > 0
+          ? ejercicios.map(toRow)
+          : [["Sin ejercicios cargados", "-", "-", "-"]];
 
         while (tabla.length < maxEjercicios) {
           tabla.push(["", "", "", ""]);
@@ -1916,7 +1949,7 @@ function generarPDFRutina() {
           }
         });
 
-        if (doc.lastAutoTable.finalY > maxFinalY) {
+        if (doc.lastAutoTable?.finalY > maxFinalY) {
           maxFinalY = doc.lastAutoTable.finalY;
         }
       });
@@ -1933,7 +1966,51 @@ function generarPDFRutina() {
     }
   });
 
-  doc.save("rutina_gym.pdf");
+    if (typeof File === "undefined") {
+      doc.save(fileName);
+      showAppToast("PDF descargado. Adjuntalo manualmente en WhatsApp.", "info");
+      return;
+    }
+
+    const blob = doc.output("blob");
+    const file = new File([blob], fileName, { type: "application/pdf" });
+    const shareData = {
+      files: [file],
+      title: "Rutina Gym",
+      text: "Te comparto mi rutina de entrenamiento."
+    };
+
+    let canSharePdf = false;
+    try {
+      canSharePdf = Boolean(navigator.canShare && navigator.share && navigator.canShare({ files: [file] }));
+    } catch (_) {
+      canSharePdf = false;
+    }
+
+    if (canSharePdf) {
+      try {
+        await navigator.share(shareData);
+        showAppToast("PDF listo para compartir", "success");
+        return;
+      } catch (shareError) {
+        if (shareError?.name === "AbortError") {
+          doc.save(fileName);
+          showAppToast("PDF generado. Adjuntalo manualmente en WhatsApp.", "info");
+          return;
+        }
+
+        doc.save(fileName);
+        showAppToast("No se pudo compartir el PDF. Se descargó en el dispositivo.", "warning");
+        return;
+      }
+    }
+
+    doc.save(fileName);
+    showAppToast("PDF descargado. Adjuntalo manualmente en WhatsApp.", "info");
+  } catch (error) {
+    console.error("Error generando PDF", error);
+    showAppToast("No se pudo generar el PDF.", "error");
+  }
 }
 
 
