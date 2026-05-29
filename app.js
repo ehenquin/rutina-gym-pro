@@ -229,6 +229,70 @@ function showAppToast(message, type = "info") {
   }, 2800);
 }
 
+function downloadPdfBlob(pdfBlob, fileName) {
+  const url = URL.createObjectURL(pdfBlob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function showPdfReadyModal({ pdfBlob, fileName }) {
+  return new Promise(resolve => {
+    const overlay = document.createElement("div");
+    overlay.className = "app-modal-overlay";
+    overlay.innerHTML = `
+      <div class="app-modal app-pdf-modal" role="dialog" aria-modal="true" aria-labelledby="app-pdf-modal-title">
+        <h2 id="app-pdf-modal-title">PDF generado</h2>
+        <p>Descargá el archivo y adjuntalo manualmente en WhatsApp o Telegram.</p>
+        <div class="app-modal-actions app-pdf-modal-actions">
+          <button type="button" class="app-modal-btn primary" data-action="download">Descargar PDF</button>
+          <button type="button" class="app-modal-btn success" data-action="whatsapp">Abrir WhatsApp Web</button>
+          <button type="button" class="app-modal-btn primary" data-action="telegram">Abrir Telegram Web</button>
+          <button type="button" class="app-modal-btn cancel" data-action="close">Cerrar</button>
+        </div>
+      </div>
+    `;
+
+    const closeModal = () => closeAppModal(overlay, true, resolve);
+    const download = () => {
+      downloadPdfBlob(pdfBlob, fileName);
+      showAppToast("PDF descargado.", "success");
+    };
+
+    overlay.querySelector('[data-action="download"]').addEventListener("click", () => {
+      download();
+    });
+
+    overlay.querySelector('[data-action="whatsapp"]').addEventListener("click", () => {
+      downloadPdfBlob(pdfBlob, fileName);
+      window.open("https://web.whatsapp.com/", "_blank", "noopener");
+      showAppToast("Adjuntá manualmente el PDF descargado.", "info");
+    });
+
+    overlay.querySelector('[data-action="telegram"]').addEventListener("click", () => {
+      downloadPdfBlob(pdfBlob, fileName);
+      window.open("https://web.telegram.org/", "_blank", "noopener");
+      showAppToast("Adjuntá manualmente el PDF descargado.", "info");
+    });
+
+    overlay.querySelector('[data-action="close"]').addEventListener("click", closeModal);
+    overlay.addEventListener("click", event => {
+      if (event.target === overlay) closeModal();
+    });
+    overlay.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeModal();
+    });
+
+    getAppModalStack().appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add("is-visible"));
+    overlay.querySelector('[data-action="download"]').focus();
+  });
+}
+
 function showAuthPanel(panel) {
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
@@ -1966,47 +2030,14 @@ async function generarPDFRutina() {
     }
   });
 
-    if (typeof File === "undefined") {
-      doc.save(fileName);
-      showAppToast("PDF descargado. Adjuntalo manualmente en WhatsApp.", "info");
-      return;
-    }
-
     const blob = doc.output("blob");
-    const file = new File([blob], fileName, { type: "application/pdf" });
-    const shareData = {
-      files: [file],
-      title: "Rutina Gym",
-      text: "Te comparto mi rutina de entrenamiento."
-    };
-
-    let canSharePdf = false;
     try {
-      canSharePdf = Boolean(navigator.canShare && navigator.share && navigator.canShare({ files: [file] }));
-    } catch (_) {
-      canSharePdf = false;
+      await showPdfReadyModal({ pdfBlob: blob, fileName });
+    } catch (modalError) {
+      console.error("Error mostrando modal PDF", modalError);
+      downloadPdfBlob(blob, fileName);
+      showAppToast("PDF descargado. Adjuntalo manualmente en WhatsApp.", "warning");
     }
-
-    if (canSharePdf) {
-      try {
-        await navigator.share(shareData);
-        showAppToast("PDF listo para compartir", "success");
-        return;
-      } catch (shareError) {
-        if (shareError?.name === "AbortError") {
-          doc.save(fileName);
-          showAppToast("PDF generado. Adjuntalo manualmente en WhatsApp.", "info");
-          return;
-        }
-
-        doc.save(fileName);
-        showAppToast("No se pudo compartir el PDF. Se descargó en el dispositivo.", "warning");
-        return;
-      }
-    }
-
-    doc.save(fileName);
-    showAppToast("PDF descargado. Adjuntalo manualmente en WhatsApp.", "info");
   } catch (error) {
     console.error("Error generando PDF", error);
     showAppToast("No se pudo generar el PDF.", "error");
