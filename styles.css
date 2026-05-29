@@ -1004,6 +1004,82 @@ body {
     cursor: pointer;
 }
 
+.pwa-install-card {
+    margin: 8px 0 14px;
+    border: 1px solid rgba(209, 209, 214, 0.8);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.pwa-install-card summary {
+    padding: 11px 12px;
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: var(--text);
+    cursor: pointer;
+    list-style: none;
+}
+
+.pwa-install-card summary::-webkit-details-marker {
+    display: none;
+}
+
+.pwa-install-card summary::after {
+    content: "+";
+    float: right;
+    color: var(--primary);
+    font-weight: 900;
+}
+
+.pwa-install-card[open] summary::after {
+    content: "−";
+}
+
+.pwa-install-content {
+    padding: 0 12px 12px;
+    color: #3a3a3c;
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
+.pwa-install-content h3 {
+    margin: 0 0 6px;
+    font-size: 0.95rem;
+    color: var(--text);
+}
+
+.pwa-install-content p {
+    margin: 0 0 9px;
+}
+
+.pwa-install-steps {
+    margin-top: 9px;
+}
+
+.pwa-install-steps strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text);
+    font-size: 0.82rem;
+}
+
+.pwa-install-steps ol {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.pwa-install-steps li {
+    margin: 2px 0;
+}
+
+.pwa-install-note {
+    margin-top: 10px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
 /* ========================================= */
 /* MODALES Y TOASTS APP                      */
 /* ========================================= */
