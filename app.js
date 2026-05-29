@@ -100,12 +100,12 @@ function getFriendlyAuthMessage(message, fallback) {
   const code = normalizeAuthValue(message);
 
   const messages = {
-    SIN_FECHA_VENCIMIENTO: "Tu cuenta todavÃ­a no tiene una fecha de acceso asignada.",
-    PAGO_PENDIENTE: "Tu pago estÃ¡ pendiente. ConsultÃ¡ con el administrador.",
-    CUENTA_PENDIENTE: "Tu cuenta estÃ¡ pendiente de aprobaciÃ³n por el administrador.",
-    PENDIENTE: "Tu cuenta estÃ¡ pendiente de aprobaciÃ³n por el administrador.",
-    BLOQUEADO: "Tu cuenta estÃ¡ bloqueada. ConsultÃ¡ con el administrador.",
-    VENCIDO: "Tu acceso estÃ¡ vencido. ConsultÃ¡ con el administrador."
+    SIN_FECHA_VENCIMIENTO: "Tu cuenta todavía no tiene una fecha de acceso asignada.",
+    PAGO_PENDIENTE: "Tu pago está pendiente. Consultá con el administrador.",
+    CUENTA_PENDIENTE: "Tu cuenta está pendiente de aprobación por el administrador.",
+    PENDIENTE: "Tu cuenta está pendiente de aprobación por el administrador.",
+    BLOQUEADO: "Tu cuenta está bloqueada. Consultá con el administrador.",
+    VENCIDO: "Tu acceso está vencido. Consultá con el administrador."
   };
 
   if (messages[code]) return messages[code];
@@ -193,7 +193,7 @@ function actualizarDiasHeaderDesdeUsuario() {
   }
 
   if (estado === "PENDIENTE") {
-    el.innerText = "Pendiente de aprobaciÃ³n";
+    el.innerText = "Pendiente de aprobación";
     el.style.color = "#d11";
     return true;
   }
@@ -208,7 +208,7 @@ function actualizarDiasHeaderDesdeUsuario() {
       return true;
     }
 
-    el.innerText = diasRestantes === 1 ? "Falta 1 dÃ­a de prueba" : `Faltan ${diasRestantes} dÃ­as de prueba`;
+    el.innerText = diasRestantes === 1 ? "Falta 1 día de prueba" : `Faltan ${diasRestantes} días de prueba`;
     el.style.color = diasRestantes <= 0 ? "#d11" : "#444";
     return true;
   }
@@ -220,7 +220,7 @@ function actualizarDiasHeaderDesdeUsuario() {
       return true;
     }
 
-    el.innerText = diasRestantes === 1 ? "1 dÃ­a restante" : `${diasRestantes} dÃ­as restantes`;
+    el.innerText = diasRestantes === 1 ? "1 día restante" : `${diasRestantes} días restantes`;
     el.style.color = diasRestantes <= 0 ? "#d11" : "#0a8f4b";
     return true;
   }
@@ -272,37 +272,37 @@ function getLoginBlockMessage(user, data) {
   const acceso = data?.acceso === true || data?.acceso === "true" || user?.acceso === true || user?.acceso === "true";
 
   if (estado === "BLOQUEADO") {
-    return getFriendlyAuthMessage(apiMessage, "Tu cuenta estÃ¡ bloqueada. ConsultÃ¡ con el administrador.");
+    return getFriendlyAuthMessage(apiMessage, "Tu cuenta está bloqueada. Consultá con el administrador.");
   }
 
   if (estado === "VENCIDO") {
-    return getFriendlyAuthMessage(apiMessage, "Tu acceso estÃ¡ vencido. ConsultÃ¡ con el administrador.");
+    return getFriendlyAuthMessage(apiMessage, "Tu acceso está vencido. Consultá con el administrador.");
   }
 
   if (rol === "ADMIN") return "";
 
   if (estado === "PENDIENTE") {
-    return "Tu cuenta estÃ¡ pendiente de aprobaciÃ³n por el administrador.";
+    return "Tu cuenta está pendiente de aprobación por el administrador.";
   }
 
   if (data?.acceso === false || data?.acceso === "false") {
-    return getFriendlyAuthMessage(apiMessage, "Tu acceso no estÃ¡ habilitado. ConsultÃ¡ con tu entrenador.");
+    return getFriendlyAuthMessage(apiMessage, "Tu acceso no está habilitado. Consultá con tu entrenador.");
   }
 
   if (user?.acceso === false || user?.acceso === "false") {
-    return getFriendlyAuthMessage(apiMessage, "Tu acceso no estÃ¡ habilitado. ConsultÃ¡ con tu entrenador.");
+    return getFriendlyAuthMessage(apiMessage, "Tu acceso no está habilitado. Consultá con tu entrenador.");
   }
 
   if (estado === "PRUEBA") {
-    return acceso ? "" : getFriendlyAuthMessage(apiMessage, "Tu prueba no estÃ¡ habilitada o estÃ¡ vencida.");
+    return acceso ? "" : getFriendlyAuthMessage(apiMessage, "Tu prueba no está habilitada o está vencida.");
   }
 
   if (estado === "ACTIVO") {
-    return pago === "SI" ? "" : getFriendlyAuthMessage(apiMessage, "Tu pago estÃ¡ pendiente. ConsultÃ¡ con el administrador.");
+    return pago === "SI" ? "" : getFriendlyAuthMessage(apiMessage, "Tu pago está pendiente. Consultá con el administrador.");
   }
 
   if (estado !== "ACTIVO") {
-    return getFriendlyAuthMessage(apiMessage, "Tu cuenta estÃ¡ pendiente de aprobaciÃ³n por el administrador.");
+    return getFriendlyAuthMessage(apiMessage, "Tu cuenta está pendiente de aprobación por el administrador.");
   }
 
   return "";
@@ -335,7 +335,7 @@ async function handleAppsScriptLogin() {
   const password = document.getElementById("login-password")?.value;
 
   if (!telefono || !password) {
-    showAuthMessage("IngresÃ¡ telÃ©fono y password.", true);
+    showAuthMessage("Ingresá teléfono y password.", true);
     return;
   }
 
@@ -346,7 +346,7 @@ async function handleAppsScriptLogin() {
     if (user && !user.telefono) user.telefono = telefono;
 
     if (!getAuthSuccess(data)) {
-      showAuthMessage(data?.error || data?.message || "No se pudo iniciar sesiÃ³n.", true);
+      showAuthMessage(data?.error || data?.message || "No se pudo iniciar sesión.", true);
       return;
     }
 
@@ -359,7 +359,7 @@ async function handleAppsScriptLogin() {
     enterAppAfterLogin(user);
   } catch (err) {
     console.error("[APPS SCRIPT] login error", err);
-    showAuthMessage(err.message || "Error de conexiÃ³n.", true);
+    showAuthMessage(err.message || "Error de conexión.", true);
   }
 }
 
@@ -372,12 +372,12 @@ async function handleAppsScriptRegister() {
   const confirmarPassword = document.getElementById("register-password-confirm")?.value;
 
   if (!nombre || !apellido || !mail || !telefono || !password || !confirmarPassword) {
-    showAuthMessage("CompletÃ¡ todos los campos.", true);
+    showAuthMessage("Completá todos los campos.", true);
     return;
   }
 
   if (password !== confirmarPassword) {
-    showAuthMessage("Las contraseÃ±as no coinciden.", true);
+    showAuthMessage("Las contraseñas no coinciden.", true);
     return;
   }
 
@@ -405,10 +405,10 @@ async function handleAppsScriptRegister() {
     showAuthPanel("login");
     const loginPhone = document.getElementById("login-phone");
     if (loginPhone) loginPhone.value = telefono;
-    showAuthMessage("Registro recibido. Tu cuenta queda pendiente de aprobaciÃ³n por el administrador.");
+    showAuthMessage("Registro recibido. Tu cuenta queda pendiente de aprobación por el administrador.");
   } catch (err) {
     console.error("[APPS SCRIPT] register error", err);
-    showAuthMessage(err.message || "Error de conexiÃ³n.", true);
+    showAuthMessage(err.message || "Error de conexión.", true);
   }
 }
 
@@ -436,13 +436,13 @@ const SAVE_DEBOUNCE_MS = 500;
 // --- EXERCISE CATALOG ---
 const BASE_CATALOG = {
   "PECHO": ["Press banca plano", "Aperturas con mancuernas", "Fondos en paralelas", "Pullover"],
-  "ESPALDA": ["Dominadas", "Remo con barra", "JalÃ³n al pecho", "Remo con mancuerna"],
-  "HOMBROS": ["Press militar", "Elevaciones laterales", "PÃ¡jaros (posterior)", "Frontal mancuerna"],
-  "PIERNAS": ["Sentadilla", "Prensa", "Peso muerto rumano", "ExtensiÃ³n cuÃ¡driceps"],
-  "BÃCEPS": ["Curl con barra", "Curl alternado", "Curl martillo", "Curl concentrado"],
-  "TRÃCEPS": ["Press francÃ©s", "ExtensiÃ³n polea", "Fondos banco", "Patada trÃ­ceps"],
-  "GLÃšTEOS": ["Hip thrust", "Patada polea", "Sentadilla sumo", "Puente glÃºteo"],
-  "ABDOMEN": ["Crunch", "Plancha", "ElevaciÃ³n piernas", "Rueda abdominal"]
+  "ESPALDA": ["Dominadas", "Remo con barra", "Jalón al pecho", "Remo con mancuerna"],
+  "HOMBROS": ["Press militar", "Elevaciones laterales", "Pájaros (posterior)", "Frontal mancuerna"],
+  "PIERNAS": ["Sentadilla", "Prensa", "Peso muerto rumano", "Extensión cuádriceps"],
+  "BÍCEPS": ["Curl con barra", "Curl alternado", "Curl martillo", "Curl concentrado"],
+  "TRÍCEPS": ["Press francés", "Extensión polea", "Fondos banco", "Patada tríceps"],
+  "GLÚTEOS": ["Hip thrust", "Patada polea", "Sentadilla sumo", "Puente glúteo"],
+  "ABDOMEN": ["Crunch", "Plancha", "Elevación piernas", "Rueda abdominal"]
 };
 
 
@@ -545,17 +545,17 @@ function init() {
 
   // updateDiasRestantes(); // COMENTADO PARA NO ROMPER TEXTO DEL HEADER
 
-  // ---> INICIO DE LÃNEA A AGREGAR <---
+  // ---> INICIO DE LÍNEA A AGREGAR <---
   initWeightModule();
   initProgressModule();
   initMainMenu();
-  // ---> FIN DE LÃNEA A AGREGAR <---
+  // ---> FIN DE LÍNEA A AGREGAR <---
   verificarModoTester(); // LLAMADA AL MODO TESTER
 }
 
 
 
-// SincronizaciÃ³n manejada por startUserAccessSync()
+// Sincronización manejada por startUserAccessSync()
 
 
 
@@ -594,7 +594,7 @@ function createExerciseObject(nombre = "", grupo = "", series = "", reps = "", p
 
 function generateRoutineText() {
 
-  let text = "ðŸ‹ï¸ Rutina Gym\n\n";
+  let text = "🏋️ Rutina Gym\n\n";
 
   const semanas = state.rutina.semanas;
 
@@ -606,13 +606,13 @@ function generateRoutineText() {
 
     Object.keys(dias).forEach(d => {
 
-      text += "\nDÃ­a " + d + "\n";
+      text += "\nDía " + d + "\n";
 
       dias[d].ejercicios.forEach(ex => {
 
         if (!ex.nombre) return;
 
-        text += "â€¢ " + ex.nombre;
+        text += "• " + ex.nombre;
 
         if (ex.series) text += " | " + ex.series + " sets";
 
@@ -662,9 +662,9 @@ function renderTabs() {
     btn.className = `tab-btn ${state.currentWeek == w ? 'active' : ''}`;
 
     // 2. Insertamos el HTML con el nombre y la cruz roja
-    btn.innerHTML = `SEMANA ${w} <span class="delete-week" onclick="deleteWeek(${w}, event)" title="Eliminar semana">âœ–</span>`;
+    btn.innerHTML = `SEMANA ${w} <span class="delete-week" onclick="deleteWeek(${w}, event)" title="Eliminar semana">✖</span>`;
 
-    // 3. Abrimos correctamente el evento click para cambiar de pestaÃ±a
+    // 3. Abrimos correctamente el evento click para cambiar de pestaña
     btn.onclick = () => {
 
       state.currentWeek = parseInt(w);
@@ -675,7 +675,7 @@ function renderTabs() {
 
       scrollActiveWeekIntoView();
 
-    }; // AquÃ­ cierra el onclick correctamente
+    }; // Aquí cierra el onclick correctamente
 
     tabsContainer.appendChild(btn);
 
@@ -723,20 +723,20 @@ function renderApp() {
 
     dayCard.className = 'day-card';
 
-    // guardar quÃ© dÃ­a es en el DOM
+    // guardar qué día es en el DOM
     dayCard.dataset.day = dayId;
 
-    // no abrir siempre el dÃ­a 1
+    // no abrir siempre el día 1
     if (state.openDay == dayId) {
       dayCard.classList.add('open');
     }
 
     dayCard.innerHTML = `
             <div class="day-header">
-                <h3>DÃ­a ${dayId}</h3>
+                <h3>Día ${dayId}</h3>
                 <div style="display:flex; align-items:center; gap:16px;">
-                    <button class="delete-day" type="button" onclick="deleteDay(${dayId}, event)">âœ–</button>
-                    <span class="arrow">â–¼</span>
+                    <button class="delete-day" type="button" onclick="deleteDay(${dayId}, event)">✖</button>
+                    <span class="arrow">▼</span>
                 </div>
             </div>
 
@@ -782,14 +782,14 @@ function createExerciseRow(dayId, index, exercise) {
   const row = document.createElement('div');
 
   row.className = 'exercise-row';
-  row.dataset.day = dayId;      // identifica el dÃ­a
-  row.dataset.index = index;    // identifica el ejercicio dentro del dÃ­a
+  row.dataset.day = dayId;      // identifica el día
+  row.dataset.index = index;    // identifica el ejercicio dentro del día
 
   const finalCatalog = getFinalCatalog();
 
   let optionsHtml = `
     <option value="">Seleccionar ejercicio...</option>
-    <option value="__ADD_SECTION__">+ Crear secciÃ³n...</option>
+    <option value="__ADD_SECTION__">+ Crear sección...</option>
     <option value="__ADD_EXERCISE__">+ Crear ejercicio...</option>
 `;
 
@@ -821,7 +821,7 @@ function createExerciseRow(dayId, index, exercise) {
                 type="button"
                 title="Eliminar ejercicio"
                 onclick="deleteExercise(${dayId}, ${index}, this)">
-            âœ–
+            ✖
         </button>
 
 
@@ -898,7 +898,7 @@ window.handleExerciseSelect = (dayId, index, selectEl) => {
   if (val === "__ADD_SECTION__") {
 
     const ok = addNewSectionFlow();
-    selectEl.value = ""; // vuelve a â€œSeleccionarâ€¦â€
+    selectEl.value = ""; // vuelve a “Seleccionar…”
     if (ok) renderApp();
     return;
 
@@ -908,7 +908,7 @@ window.handleExerciseSelect = (dayId, index, selectEl) => {
 
     const created = addNewExerciseFlow();
 
-    selectEl.value = ""; // vuelve a â€œSeleccionarâ€¦â€
+    selectEl.value = ""; // vuelve a “Seleccionar…”
 
     if (created) {
       renderApp();
@@ -918,7 +918,7 @@ window.handleExerciseSelect = (dayId, index, selectEl) => {
 
   }
 
-  // SelecciÃ³n normal
+  // Selección normal
   updateEx(dayId, index, "nombre", selectEl);
 
 };
@@ -932,7 +932,7 @@ window.handleExerciseSelect = (dayId, index, selectEl) => {
 
 function addNewSectionFlow() {
 
-  let section = prompt("Nombre de la secciÃ³n nueva (ej: PANTORRILLAS):");
+  let section = prompt("Nombre de la sección nueva (ej: PANTORRILLAS):");
 
   if (!section) return false;
 
@@ -945,7 +945,7 @@ function addNewSectionFlow() {
   const userCatalog = loadUserCatalog();
 
   if (userCatalog[section]) {
-    alert("Esa secciÃ³n ya existe.");
+    alert("Esa sección ya existe.");
     return false;
   }
 
@@ -953,7 +953,7 @@ function addNewSectionFlow() {
 
   saveUserCatalog(userCatalog);
 
-  alert("SecciÃ³n creada: " + section);
+  alert("Sección creada: " + section);
 
   return true;
 
@@ -961,7 +961,7 @@ function addNewSectionFlow() {
 
 function addNewExerciseFlow() {
 
-  let exName = prompt("Nombre del ejercicio (ej: Buen dÃ­a con barra):");
+  let exName = prompt("Nombre del ejercicio (ej: Buen día con barra):");
 
   if (!exName) return false;
 
@@ -969,14 +969,14 @@ function addNewExerciseFlow() {
 
   if (!exName) return false;
 
-  // Elegir secciÃ³n
+  // Elegir sección
   const finalCatalog = getFinalCatalog();
   const sections = Object.keys(finalCatalog);
 
   let section = prompt(
-    "Â¿En quÃ© secciÃ³n va?\n\n" +
+    "¿En qué sección va?\n\n" +
     "Ejemplos: " + sections.slice(0, 6).join(", ") + "\n\n" +
-    "EscribÃ­ el nombre exacto o uno nuevo (ej: PANTORRILLAS):"
+    "Escribí el nombre exacto o uno nuevo (ej: PANTORRILLAS):"
   );
 
   if (!section) return false;
@@ -987,7 +987,7 @@ function addNewExerciseFlow() {
 
   section = section.toUpperCase();
 
-  // Guardar en catÃ¡logo de usuario
+  // Guardar en catálogo de usuario
   const userCatalog = loadUserCatalog();
 
   if (!userCatalog[section]) {
@@ -999,7 +999,7 @@ function addNewExerciseFlow() {
   const alreadyExistsInUser = userCatalog[section].includes(exName);
 
   if (alreadyExistsInFinal || alreadyExistsInUser) {
-    alert("Ese ejercicio ya existe en esa secciÃ³n.");
+    alert("Ese ejercicio ya existe en esa sección.");
     return false;
   }
 
@@ -1122,7 +1122,7 @@ function setupEventListeners() {
   };
 
   document.getElementById('btn-reset-week').onclick = () => {
-    if (!confirm("Â¿Seguro que querÃ©s reiniciar los ejercicios de esta semana?")) return;
+    if (!confirm("¿Seguro que querés reiniciar los ejercicios de esta semana?")) return;
     const dias = state.rutina.semanas[state.currentWeek].dias;
     Object.keys(dias).forEach(dia => {
       dias[dia].ejercicios.forEach(ex => {
@@ -1241,7 +1241,7 @@ function calculateMaxWeight(pesoTexto) {
 
   const max = Math.max(...numeros);
 
-  return "mÃ¡x: " + max + " kg";
+  return "máx: " + max + " kg";
 }
 
 
@@ -1312,7 +1312,7 @@ function updateDiasRestantes(serverUser = null) {
       app.style.filter = "none";
     }
 
-    // cerrar modal SOLO si fue abierto por bloqueo automÃ¡tico
+    // cerrar modal SOLO si fue abierto por bloqueo automático
     if (modal && modal.dataset.locked === "true") {
       modal.style.display = "none";
       modal.dataset.locked = "false";
@@ -1353,7 +1353,7 @@ function updateDiasRestantes(serverUser = null) {
     desbloquearApp();
 
     if (btnPlan) {
-      btnPlan.innerText = "ðŸ’Ž Activar PRO";
+      btnPlan.innerText = "💎 Activar PRO";
       btnPlan.style.display = "inline-block";
     }
 
@@ -1369,7 +1369,7 @@ function updateDiasRestantes(serverUser = null) {
     el.style.color = "#d11";
 
     if (btnPlan) {
-      btnPlan.innerText = "ðŸ’Ž Activar PRO";
+      btnPlan.innerText = "💎 Activar PRO";
       btnPlan.style.display = "inline-block";
     }
 
@@ -1378,11 +1378,11 @@ function updateDiasRestantes(serverUser = null) {
   }
 
   if (plan === "pro") {
-    el.innerText = diff + " dÃ­as restantes";
+    el.innerText = diff + " días restantes";
     el.style.color = "#0a8f4b";
 
     if (btnPlan) {
-      btnPlan.innerText = "ðŸ’Ž Plan PRO activo";
+      btnPlan.innerText = "💎 Plan PRO activo";
       btnPlan.style.display = "inline-block";
     }
 
@@ -1393,15 +1393,15 @@ function updateDiasRestantes(serverUser = null) {
   desbloquearApp();
 
   if (diff <= 3) {
-    el.innerText = "âš  " + diff + " dÃ­as restantes";
+    el.innerText = "⚠ " + diff + " días restantes";
     el.style.color = "#d11";
   } else {
-    el.innerText = diff + " dÃ­as restantes";
+    el.innerText = diff + " días restantes";
     el.style.color = "#444";
   }
 
   if (btnPlan) {
-    btnPlan.innerText = "ðŸ’Ž Activar PRO";
+    btnPlan.innerText = "💎 Activar PRO";
     btnPlan.style.display = "inline-block";
   }
 
@@ -1441,15 +1441,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 /* =========================================================
-   BOTÃ“N: "YA TRANSFERÃ"
+   BOTÓN: "YA TRANSFERÍ"
    ---------------------------------------------------------
-   Esta funciÃ³n se ejecuta cuando el usuario confirma que
-   realizÃ³ la transferencia para activar el plan PRO.
+   Esta función se ejecuta cuando el usuario confirma que
+   realizó la transferencia para activar el plan PRO.
 
    Flujo completo:
-   1) Obtiene telÃ©fono del usuario guardado en localStorage
-   2) Obtiene el alias desde donde el usuario transfiriÃ³
-   3) EnvÃ­a la solicitud a Apps Script (action=solicitarPago)
+   1) Obtiene teléfono del usuario guardado en localStorage
+   2) Obtiene el alias desde donde el usuario transfirió
+   3) Envía la solicitud a Apps Script (action=solicitarPago)
    4) Cierra el modal de pago
    ========================================================= */
 
@@ -1460,29 +1460,29 @@ document.addEventListener("DOMContentLoaded", () => {
        1) OBTENER DATOS DEL USUARIO
        ------------------------------------------------------- */
 
-    // usuario actual guardado al iniciar sesiÃ³n
+    // usuario actual guardado al iniciar sesión
     const usuarioActual = JSON.parse(localStorage.getItem("usuario") || "{}");
     const telefono = usuarioActual.telefono || localStorage.getItem("telefono");
 
-    // alias que el usuario escribiÃ³ en el campo del modal
+    // alias que el usuario escribió en el campo del modal
     const aliasInput = document.getElementById("alias-cliente");
     const aliasCliente = aliasInput ? aliasInput.value.trim() : "";
     showPlanMessage("");
 
 
     /* -------------------------------------------------------
-       2) VALIDACIONES BÃSICAS
+       2) VALIDACIONES BÁSICAS
        ------------------------------------------------------- */
 
-    // si por algÃºn motivo no existe el telÃ©fono
+    // si por algún motivo no existe el teléfono
     if (!telefono) {
       showPlanMessage("Error: usuario no identificado", "error");
       return;
     }
 
-    // si el usuario no escribiÃ³ el alias desde donde pagÃ³
+    // si el usuario no escribió el alias desde donde pagó
     if (!aliasCliente) {
-      showPlanMessage("Por favor escribÃ­ el alias desde donde hiciste la transferencia", "error");
+      showPlanMessage("Por favor escribí el alias desde donde hiciste la transferencia", "error");
       return;
     }
 
@@ -1523,14 +1523,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* -------------------------------------------------------
-        4) ERROR DE CONEXIÃ“N O EXCEPCIÃ“N
+        4) ERROR DE CONEXIÓN O EXCEPCIÓN
        ------------------------------------------------------- */
 
     catch (err) {
 
       console.error(err);
 
-      showPlanMessage(err?.message || "Error de conexiÃ³n", "error");
+      showPlanMessage(err?.message || "Error de conexión", "error");
 
     }
 
@@ -1540,7 +1540,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-// despuÃ©s del login exitoso
+// después del login exitoso
 
 
 
@@ -1620,7 +1620,7 @@ function generarPDFRutina() {
   }
 
   const pageWidth = doc.internal.pageSize.getWidth();
-  //espacio entre â€œDÃ­aâ€ y la primera tabla estÃ¡ determinado por una sola variable: startX.
+  //espacio entre “Día” y la primera tabla está determinado por una sola variable: startX.
   //const startX = 25; la tabla empieza en 25 mm probar const startX = 16;
   const startX = 18;
   const marginRight = 14;
@@ -1655,10 +1655,10 @@ function generarPDFRutina() {
       let maxFinalY = startY;
       //LETRA DE DIA
       doc.setFontSize(9);
-      //etiqueta del dÃ­a
-      // doc.text("DÃ­a " + dia, 10, startY + 7); el texto estÃ¡ en 10 mm, dejando 15 mm de espacio.      
-      // probar doc.text("DÃ­a " + dia, 12, startY + 7); mas chico mueve "dia" mas a la izquierda
-      doc.text("DÃ­a " + dia, 8, startY + 7);
+      //etiqueta del día
+      // doc.text("Día " + dia, 10, startY + 7); el texto está en 10 mm, dejando 15 mm de espacio.      
+      // probar doc.text("Día " + dia, 12, startY + 7); mas chico mueve "dia" mas a la izquierda
+      doc.text("Día " + dia, 8, startY + 7);
 
       let maxEjercicios = 1;
       chunk.forEach(semana => {
@@ -1764,17 +1764,17 @@ function deleteExercise(dayId, index, btn) {
 /* ================================================= */
 
 window.deleteDay = (dayId, event) => {
-  // Evitamos que al hacer clic en la X se expanda/contraiga el acordeÃ³n
+  // Evitamos que al hacer clic en la X se expanda/contraiga el acordeón
   if (event) event.stopPropagation();
-  if (!confirm("Â¿Eliminar el DÃ­a " + dayId + " por completo?")) return;
+  if (!confirm("¿Eliminar el Día " + dayId + " por completo?")) return;
 
   const dias = state.rutina.semanas[state.currentWeek].dias;
 
-  // 1. Elimina el dÃ­a del objeto usando la key (dayId) real
+  // 1. Elimina el día del objeto usando la key (dayId) real
   delete dias[dayId];
 
-  // 2. Si el dÃ­a eliminado era el que estaba abierto, limpiamos el estado
-  // y tratamos de abrir otro dÃ­a vÃ¡lido para que no quede la pantalla vacÃ­a
+  // 2. Si el día eliminado era el que estaba abierto, limpiamos el estado
+  // y tratamos de abrir otro día válido para que no quede la pantalla vacía
   if (state.openDay == dayId) {
     state.openDay = null;
     const diasDisponibles = Object.keys(dias);
@@ -1800,16 +1800,16 @@ window.deleteWeek = (weekId, event) => {
   const numSemanas = Object.keys(semanas).length;
 
   if (numSemanas <= 1) {
-    alert("No podÃ©s eliminar la Ãºnica semana disponible.");
+    alert("No podés eliminar la única semana disponible.");
     return;
   }
 
-  if (!confirm("Â¿Eliminar la SEMANA " + weekId + " por completo?")) return;
+  if (!confirm("¿Eliminar la SEMANA " + weekId + " por completo?")) return;
 
   // 1. Eliminar la semana del objeto global
   delete semanas[weekId];
 
-  // 2. Si borramos la semana que estÃ¡bamos mirando, saltamos a la primera que haya quedado
+  // 2. Si borramos la semana que estábamos mirando, saltamos a la primera que haya quedado
   if (state.currentWeek == weekId) {
     const semanasRestantes = Object.keys(semanas);
     state.currentWeek = parseInt(semanasRestantes[0]);
@@ -1838,12 +1838,12 @@ window.deleteWeek = (weekId, event) => {
 
 
 /* ========================================================= */
-/* MÃ“DULO CONTROL DE PESO CORPORAL                           */
+/* MÓDULO CONTROL DE PESO CORPORAL                           */
 /* ========================================================= */
 
 const WEIGHT_STORAGE_KEY = 'gym_weight_log_v1';
 let weightLog = [];
-let isWeightModuleInitialized = false; // <-- GUARD PARA EVITAR DUPLICACIÃ“N
+let isWeightModuleInitialized = false; // <-- GUARD PARA EVITAR DUPLICACIÓN
 
 function loadWeightLog() {
   const data = localStorage.getItem(WEIGHT_STORAGE_KEY);
@@ -1873,7 +1873,7 @@ function saveWeightLog() {
 
 
 /* ========================================================= */
-/* MENÃš PRINCIPAL NAVEGACIÃ“N                                 */
+/* MENÚ PRINCIPAL NAVEGACIÓN                                 */
 /* ========================================================= */
 function initMainMenu() {
   const btnMenu = document.getElementById('btn-main-menu');
@@ -1882,21 +1882,21 @@ function initMainMenu() {
   const btnProgress = document.getElementById('btn-progress-module');
   const btnWeight = document.getElementById('btn-weight-module');
   if (btnMenu && overlay && btnClose) {
-    // Abrir menÃº principal
+    // Abrir menú principal
     btnMenu.addEventListener('click', () => {
       overlay.style.display = 'flex';
     });
-    // Cerrar menÃº con la cruz
+    // Cerrar menú con la cruz
     btnClose.addEventListener('click', () => {
       overlay.style.display = 'none';
     });
-    // Cerrar si tocan fuera del menÃº
+    // Cerrar si tocan fuera del menú
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) {
         overlay.style.display = 'none';
       }
     });
-    // Cerrar menÃº si pulsan en "Peso Corporal" (para dejar que actÃºe su propio evento)
+    // Cerrar menú si pulsan en "Peso Corporal" (para dejar que actúe su propio evento)
     if (btnWeight) {
       btnWeight.addEventListener('click', () => {
         overlay.style.display = 'none';
@@ -1955,7 +1955,7 @@ function initWeightModule() {
     btnAdd.addEventListener('click', addWeightRecord);
   }
 
-  // Sellamos la inicializaciÃ³n para futuras llamadas de init()
+  // Sellamos la inicialización para futuras llamadas de init()
   isWeightModuleInitialized = true;
 }
 
@@ -1969,15 +1969,15 @@ function addWeightRecord() {
   const value = parseFloat(valueStr);
 
   if (!date) {
-    alert("Por favor, seleccionÃ¡ una fecha.");
+    alert("Por favor, seleccioná una fecha.");
     return;
   }
   if (isNaN(value) || value <= 0) {
-    alert("Por favor, ingresÃ¡ un peso corporal vÃ¡lido.");
+    alert("Por favor, ingresá un peso corporal válido.");
     return;
   }
 
-  // Sobrescribir si hay registro mismo dÃ­a, de lo contrario agregar
+  // Sobrescribir si hay registro mismo día, de lo contrario agregar
   const existingIndex = weightLog.findIndex(w => w.date === date);
   if (existingIndex >= 0) {
     weightLog[existingIndex].weight = value;
@@ -1992,7 +1992,7 @@ function addWeightRecord() {
 }
 
 window.deleteWeightRecord = function (date) {
-  if (!confirm("Â¿Borrar este registro?")) return;
+  if (!confirm("¿Borrar este registro?")) return;
   weightLog = weightLog.filter(w => w.date !== date);
   saveWeightLog();
   renderWeightModule();
@@ -2012,11 +2012,11 @@ function renderWeightTable() {
 
   tbody.innerHTML = "";
 
-  // Invertimos clonando el log para mostrar del mÃ¡s nuevo al mÃ¡s antiguo
+  // Invertimos clonando el log para mostrar del más nuevo al más antiguo
   const reversedLog = [...weightLog].reverse();
 
   if (reversedLog.length === 0) {
-    tbody.innerHTML = "<tr><td colspan='3' style='text-align:center; padding: 24px 0; color: #8e8e93;'>AÃºn no hay registros cargados</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='3' style='text-align:center; padding: 24px 0; color: #8e8e93;'>Aún no hay registros cargados</td></tr>";
     return;
   }
 
@@ -2029,7 +2029,7 @@ function renderWeightTable() {
             <td>${formattedDate}</td>
             <td style="color: var(--primary);">${record.weight.toFixed(1)}</td>
             <td>
-                <button class="btn-delete-weight" title="Borrar registro" onclick="deleteWeightRecord('${record.date}')">âœ–</button>
+                <button class="btn-delete-weight" title="Borrar registro" onclick="deleteWeightRecord('${record.date}')">✖</button>
             </td>
         `;
     tbody.appendChild(tr);
@@ -2037,7 +2037,7 @@ function renderWeightTable() {
 }
 
 /* ========================================================= */
-/* GRÃFICO DE EVOLUCIÃ“N (Native HTML5 Canvas)                */
+/* GRÁFICO DE EVOLUCIÓN (Native HTML5 Canvas)                */
 /* ========================================================= */
 function renderWeightChart() {
   const canvas = document.getElementById('weight-chart');
@@ -2049,12 +2049,12 @@ function renderWeightChart() {
 
   ctx.clearRect(0, 0, width, height);
 
-  // Requiere mÃ­nimo 2 puntos para unir una lÃ­nea
+  // Requiere mínimo 2 puntos para unir una línea
   if (weightLog.length < 2) {
     ctx.fillStyle = "#8e8e93";
     ctx.font = "13px -apple-system, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("AgregÃ¡ al menos 2 registros para ver el grÃ¡fico", width / 2, height / 2);
+    ctx.fillText("Agregá al menos 2 registros para ver el gráfico", width / 2, height / 2);
     return;
   }
 
@@ -2063,11 +2063,11 @@ function renderWeightChart() {
   const chartH = height - padding * 2;
 
   const weights = weightLog.map(w => w.weight);
-  const minW = Math.min(...weights) - 1.5; // Margen dinÃ¡mico inferior
-  const maxW = Math.max(...weights) + 1.5; // Margen dinÃ¡mico superior
+  const minW = Math.min(...weights) - 1.5; // Margen dinámico inferior
+  const maxW = Math.max(...weights) + 1.5; // Margen dinámico superior
   const range = maxW - minW;
 
-  // Dibujo de lÃ­neas horizontales base
+  // Dibujo de líneas horizontales base
   ctx.strokeStyle = "#e5e5ea";
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -2077,7 +2077,7 @@ function renderWeightChart() {
   ctx.lineTo(width - padding, height - padding);
   ctx.stroke();
 
-  // Dibujo de la lÃ­nea de evoluciÃ³n (Azul)
+  // Dibujo de la línea de evolución (Azul)
   ctx.strokeStyle = "#007aff";
   ctx.lineWidth = 3;
   ctx.lineCap = "round";
@@ -2114,7 +2114,7 @@ function renderWeightChart() {
 
 
 /* ===================================================== */
-/* MÃ“DULO: PROGRESO DE EJERCICIOS                        */
+/* MÓDULO: PROGRESO DE EJERCICIOS                        */
 /* ===================================================== */
 
 const PROGRESS_STORAGE_KEY = "gym_progress_v1";
@@ -2129,7 +2129,7 @@ function initProgressModule() {
 
   if (btnOpen && container && btnClose) {
     btnOpen.addEventListener("click", () => {
-      // Ocultar menÃº principal si estÃ¡ abierto
+      // Ocultar menú principal si está abierto
       document.getElementById("main-menu-overlay").style.display = "none";
 
       // Mostrar contenedor
@@ -2188,7 +2188,7 @@ function handleAddProgress() {
   const valInput = document.getElementById("progress-value").value;
 
   if (!dateInput || !exInput || !valInput) {
-    alert("CompletÃ¡ todos los campos.");
+    alert("Completá todos los campos.");
     return;
   }
 
@@ -2209,13 +2209,13 @@ function handleAddProgress() {
   const filterSelect = document.getElementById("progress-filter-select");
   const prevFilter = filterSelect.value;
   loadExerciseSelects();
-  filterSelect.value = exInput; // Autofiltrar por el recien agregado (muy Ãºtil)
+  filterSelect.value = exInput; // Autofiltrar por el recien agregado (muy útil)
 
   renderProgressUI();
 }
 
 window.deleteProgressRecord = (id) => {
-  if (confirm("Â¿Eliminar este registro?")) {
+  if (confirm("¿Eliminar este registro?")) {
     progressData = progressData.filter(r => r.id !== id);
     saveProgressData();
 
@@ -2230,7 +2230,7 @@ window.deleteProgressRecord = (id) => {
 
 
 
-/* Carga de ejercicios disponibles en CatÃ¡logo */
+/* Carga de ejercicios disponibles en Catálogo */
 function loadExerciseSelects() {
   const catalog = getFinalCatalog();
   const selectForm = document.getElementById("progress-exercise-select");
@@ -2253,7 +2253,7 @@ function loadExerciseSelects() {
   }
 
   selectForm.innerHTML = optionsHtml;
-  selectForm.value = prevFormVal; // Restaurar si habÃ­a algo
+  selectForm.value = prevFormVal; // Restaurar si había algo
 
   // Para el filtro extraemos solo los que tienen AL MENOS 1 registro
   const ejerciciosConRegistros = [...new Set(progressData.map(r => r.exercise))].sort();
@@ -2279,7 +2279,7 @@ function renderProgressUI() {
     filteredData = progressData.filter(r => r.exercise === filterVal);
   }
 
-  // Ordenar descendente (mÃ¡s nuevo arriba) para tabla
+  // Ordenar descendente (más nuevo arriba) para tabla
   const sortedDesc = [...filteredData].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   tbody.innerHTML = "";
@@ -2294,19 +2294,19 @@ function renderProgressUI() {
       <td style="font-size: 0.75rem; color:#444;">${record.exercise}</td>
       <td style="color: var(--primary);">${record.weight}</td>
       <td style="text-align:right;">
-        <button class="btn-delete-progress" type="button" onclick="deleteProgressRecord('${record.id}')">âœ–</button>
+        <button class="btn-delete-progress" type="button" onclick="deleteProgressRecord('${record.id}')">✖</button>
       </td>
     `;
     tbody.appendChild(tr);
   });
 
-  // Renderizar GrÃ¡fica solo con los datos filtrados
+  // Renderizar Gráfica solo con los datos filtrados
   renderProgressChart(filteredData, filterVal);
 }
 
 
 
-/* Renderizado GrÃ¡fica de Progreso de lÃ­nea Vanilla JS */
+/* Renderizado Gráfica de Progreso de línea Vanilla JS */
 function renderProgressChart(data, filterName) {
   const canvas = document.getElementById("progress-chart");
   if (!canvas) return;
@@ -2320,7 +2320,7 @@ function renderProgressChart(data, filterName) {
     ctx.fillStyle = "#8e8e93";
     ctx.font = "12px sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("SeleccionÃ¡ un ejercicio para ver su grÃ¡fica", w / 2, h / 2);
+    ctx.fillText("Seleccioná un ejercicio para ver su gráfica", w / 2, h / 2);
     return;
   }
 
@@ -2332,7 +2332,7 @@ function renderProgressChart(data, filterName) {
     return;
   }
 
-  // Ordenar ascendente para la grÃ¡fica (mÃ¡s viejo a izquierda, nuevo a derecha)
+  // Ordenar ascendente para la gráfica (más viejo a izquierda, nuevo a derecha)
   const sortedAsc = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   const pesos = sortedAsc.map(r => r.weight);
@@ -2346,7 +2346,7 @@ function renderProgressChart(data, filterName) {
   let range = maxW - minW;
   if (range === 0) range = 10; // Si todos los pesos son iguales, forzar rango visual
 
-  // Dibujar lÃ­nea principal
+  // Dibujar línea principal
   ctx.beginPath();
   ctx.strokeStyle = "var(--primary)";
   ctx.lineWidth = 3;
@@ -2391,7 +2391,7 @@ function renderProgressChart(data, filterName) {
 
 
 // =================================================
-// LÃ“GICA MODO TESTER 2 DÃAS (RestricciÃ³n por Frontend)
+// LÓGICA MODO TESTER 2 DÍAS (Restricción por Frontend)
 // =================================================
 function verificarModoTester() {
   if (actualizarDiasHeaderDesdeUsuario()) {
@@ -2399,7 +2399,7 @@ function verificarModoTester() {
   }
 
   const TESTER_KEY = 'gym_tester_start_v1';
-  const MAX_DAYS = 2; // DÃ­as de prueba
+  const MAX_DAYS = 2; // Días de prueba
   const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
   let testerStart = localStorage.getItem(TESTER_KEY);
@@ -2415,20 +2415,20 @@ function verificarModoTester() {
   const diffMs = now - startTime;
   const diffDays = diffMs / MS_PER_DAY;
 
-  // 2. Verificamos si expirÃ³ la restricciÃ³n local
+  // 2. Verificamos si expiró la restricción local
   if (diffDays >= MAX_DAYS) {
     document.getElementById('app-container').style.display = 'none';
     document.getElementById('tester-lock-screen').style.display = 'flex';
   } else {
     document.getElementById('app-container').style.display = 'block';
 
-    // 3. CÃ¡lculo simple en dÃ­as redondeados hacia arriba
+    // 3. Cálculo simple en días redondeados hacia arriba
     const msRestantes = (MAX_DAYS * MS_PER_DAY) - diffMs;
     const diasRestantes = Math.ceil(msRestantes / MS_PER_DAY);
 
     const textoDias = diasRestantes > 1
-      ? `Faltan ${diasRestantes} dÃ­as para bloqueo`
-      : `Falta 1 dÃ­a para bloqueo`;
+      ? `Faltan ${diasRestantes} días para bloqueo`
+      : `Falta 1 día para bloqueo`;
 
     // 4. Actualizamos exclusivamente el span manteniendo intacto todo lo del PRO
     const spanDias = document.getElementById('dias-restantes');
