@@ -259,6 +259,39 @@ header {
     background: white;
 }
 
+.ex-picker-button,
+.progress-exercise-picker-btn {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: white;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ex-picker-button.has-value,
+.progress-exercise-picker-btn.has-value {
+    color: var(--text);
+}
+
+.ex-picker-button::after,
+.progress-exercise-picker-btn::after {
+    content: "⌕";
+    float: right;
+    color: var(--primary);
+    font-weight: 900;
+}
+
+#progress-exercise-select,
+#progress-filter-select {
+    display: none;
+}
+
 .ex-copy-container {
     grid-area: copy;
     display: flex;
@@ -1253,9 +1286,171 @@ body {
     border-left: 4px solid var(--primary);
 }
 
+.exercise-picker-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100002;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.28);
+    opacity: 0;
+    transition: opacity 160ms ease;
+}
+
+.exercise-picker-overlay.is-visible {
+    opacity: 1;
+}
+
+.exercise-picker-panel {
+    width: min(100%, 520px);
+    max-height: 82vh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(209, 209, 214, 0.8);
+    border-radius: 20px 20px 16px 16px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+    transform: translateY(14px);
+    transition: transform 160ms ease;
+}
+
+.exercise-picker-overlay.is-visible .exercise-picker-panel {
+    transform: translateY(0);
+}
+
+.exercise-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 14px 10px;
+    background: white;
+}
+
+.exercise-picker-header h2 {
+    margin: 0;
+    font-size: 1.08rem;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.exercise-picker-close {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg);
+    color: #3a3a3c;
+    padding: 7px 10px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.exercise-picker-search {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    width: calc(100% - 28px);
+    margin: 0 14px 10px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #f9f9fb;
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 650;
+    outline: none;
+}
+
+.exercise-picker-search:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.14);
+}
+
+.exercise-picker-actions {
+    display: flex;
+    gap: 8px;
+    padding: 0 14px 10px;
+    background: white;
+}
+
+.exercise-picker-action {
+    flex: 1;
+    min-height: 38px;
+    border: 1px solid rgba(0, 122, 255, 0.25);
+    border-radius: 10px;
+    background: rgba(0, 122, 255, 0.08);
+    color: var(--primary);
+    font-size: 0.84rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.exercise-picker-list {
+    min-height: 180px;
+    overflow-y: auto;
+    padding: 0 14px 16px;
+}
+
+.exercise-picker-group {
+    margin-top: 12px;
+}
+
+.exercise-picker-group-title {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 8px 2px 6px;
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--text-muted);
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0;
+}
+
+.exercise-picker-option {
+    width: 100%;
+    min-height: 44px;
+    margin-top: 7px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: white;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-weight: 750;
+    text-align: left;
+    cursor: pointer;
+}
+
+.exercise-picker-option.active {
+    border-color: var(--primary);
+    background: rgba(0, 122, 255, 0.09);
+    color: var(--primary);
+}
+
+.exercise-picker-empty {
+    padding: 24px 8px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+}
+
 @media (min-width: 768px) {
     .app-modal-overlay {
         align-items: center;
+    }
+
+    .exercise-picker-overlay {
+        align-items: center;
+    }
+
+    .exercise-picker-panel {
+        border-radius: 18px;
+        max-height: 78vh;
     }
 
     .app-toast-stack {
