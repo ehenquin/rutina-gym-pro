@@ -75,6 +75,160 @@ function showAuthMessage(message, isError = false) {
   el.style.color = isError ? "#c62828" : "#555";
 }
 
+function getAppModalStack() {
+  let stack = document.getElementById("app-modal-stack");
+
+  if (!stack) {
+    stack = document.createElement("div");
+    stack.id = "app-modal-stack";
+    document.body.appendChild(stack);
+  }
+
+  return stack;
+}
+
+function getAppToastStack() {
+  let stack = document.getElementById("app-toast-stack");
+
+  if (!stack) {
+    stack = document.createElement("div");
+    stack.id = "app-toast-stack";
+    stack.className = "app-toast-stack";
+    document.body.appendChild(stack);
+  }
+
+  return stack;
+}
+
+function closeAppModal(overlay, value, resolve) {
+  if (overlay.dataset.closing === "true") return;
+  overlay.dataset.closing = "true";
+  overlay.classList.remove("is-visible");
+  setTimeout(() => {
+    overlay.remove();
+    resolve(value);
+  }, 160);
+}
+
+function showAppConfirm(options = {}) {
+  const {
+    title = "Confirmar",
+    message = "",
+    confirmText = "Aceptar",
+    cancelText = "Cancelar",
+    tone = "primary"
+  } = options;
+
+  return new Promise(resolve => {
+    const overlay = document.createElement("div");
+    overlay.className = "app-modal-overlay";
+    overlay.innerHTML = `
+      <div class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+        <h2 id="app-modal-title"></h2>
+        <p></p>
+        <div class="app-modal-actions">
+          <button type="button" class="app-modal-btn cancel"></button>
+          <button type="button" class="app-modal-btn ${tone}"></button>
+        </div>
+      </div>
+    `;
+
+    const titleEl = overlay.querySelector("h2");
+    const messageEl = overlay.querySelector("p");
+    const cancelBtn = overlay.querySelector(".app-modal-btn.cancel");
+    const confirmBtn = overlay.querySelector(`.app-modal-btn.${tone}`);
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    cancelBtn.textContent = cancelText;
+    confirmBtn.textContent = confirmText;
+
+    cancelBtn.addEventListener("click", () => closeAppModal(overlay, false, resolve));
+    confirmBtn.addEventListener("click", () => closeAppModal(overlay, true, resolve));
+    overlay.addEventListener("click", event => {
+      if (event.target === overlay) closeAppModal(overlay, false, resolve);
+    });
+    overlay.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeAppModal(overlay, false, resolve);
+      if (event.key === "Enter") closeAppModal(overlay, true, resolve);
+    });
+
+    getAppModalStack().appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add("is-visible"));
+    confirmBtn.focus();
+  });
+}
+
+function showAppInput(options = {}) {
+  const {
+    title = "Ingresar dato",
+    message = "",
+    value = "",
+    placeholder = "",
+    confirmText = "Aceptar",
+    cancelText = "Cancelar"
+  } = options;
+
+  return new Promise(resolve => {
+    const overlay = document.createElement("div");
+    overlay.className = "app-modal-overlay";
+    overlay.innerHTML = `
+      <div class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-input-title">
+        <h2 id="app-input-title"></h2>
+        <p></p>
+        <input class="app-modal-input" type="text" autocomplete="off" spellcheck="false">
+        <div class="app-modal-actions">
+          <button type="button" class="app-modal-btn cancel"></button>
+          <button type="button" class="app-modal-btn primary"></button>
+        </div>
+      </div>
+    `;
+
+    const titleEl = overlay.querySelector("h2");
+    const messageEl = overlay.querySelector("p");
+    const input = overlay.querySelector(".app-modal-input");
+    const cancelBtn = overlay.querySelector(".app-modal-btn.cancel");
+    const confirmBtn = overlay.querySelector(".app-modal-btn.primary");
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    input.value = value;
+    input.placeholder = placeholder;
+    cancelBtn.textContent = cancelText;
+    confirmBtn.textContent = confirmText;
+
+    cancelBtn.addEventListener("click", () => closeAppModal(overlay, null, resolve));
+    confirmBtn.addEventListener("click", () => closeAppModal(overlay, input.value, resolve));
+    overlay.addEventListener("click", event => {
+      if (event.target === overlay) closeAppModal(overlay, null, resolve);
+    });
+    overlay.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeAppModal(overlay, null, resolve);
+      if (event.key === "Enter") closeAppModal(overlay, input.value, resolve);
+    });
+
+    getAppModalStack().appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add("is-visible"));
+    input.focus();
+    input.select();
+  });
+}
+
+function showAppToast(message, type = "info") {
+  const stack = getAppToastStack();
+  const toast = document.createElement("div");
+  toast.className = `app-toast ${type}`;
+  toast.textContent = message;
+
+  stack.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add("is-visible"));
+
+  setTimeout(() => {
+    toast.classList.remove("is-visible");
+    setTimeout(() => toast.remove(), 180);
+  }, 2800);
+}
+
 function showAuthPanel(panel) {
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
@@ -919,13 +1073,13 @@ function createExerciseRow(dayId, index, exercise) {
 
 
 
-window.handleExerciseSelect = (dayId, index, selectEl) => {
+window.handleExerciseSelect = async (dayId, index, selectEl) => {
 
   const val = selectEl.value;
 
   if (val === "__ADD_SECTION__") {
 
-    const ok = addNewSectionFlow();
+    const ok = await addNewSectionFlow();
     selectEl.value = ""; // vuelve a “Seleccionar…”
     if (ok) renderApp();
     return;
@@ -934,7 +1088,7 @@ window.handleExerciseSelect = (dayId, index, selectEl) => {
 
   if (val === "__ADD_EXERCISE__") {
 
-    const created = addNewExerciseFlow();
+    const created = await addNewExerciseFlow();
 
     selectEl.value = ""; // vuelve a “Seleccionar…”
 
@@ -958,9 +1112,15 @@ window.handleExerciseSelect = (dayId, index, selectEl) => {
 
 
 
-function addNewSectionFlow() {
+async function addNewSectionFlow() {
 
-  let section = prompt("Nombre de la sección nueva (ej: PANTORRILLAS):");
+  let section = await showAppInput({
+    title: "Crear sección",
+    message: "Ingresá el nombre de la sección nueva.",
+    placeholder: "Ej: PANTORRILLAS",
+    confirmText: "Crear",
+    cancelText: "Cancelar"
+  });
 
   if (!section) return false;
 
@@ -973,7 +1133,7 @@ function addNewSectionFlow() {
   const userCatalog = loadUserCatalog();
 
   if (userCatalog[section]) {
-    alert("Esa sección ya existe.");
+    showAppToast("Esa sección ya existe.", "warning");
     return false;
   }
 
@@ -981,15 +1141,21 @@ function addNewSectionFlow() {
 
   saveUserCatalog(userCatalog);
 
-  alert("Sección creada: " + section);
+  showAppToast("Sección agregada", "success");
 
   return true;
 
 }
 
-function addNewExerciseFlow() {
+async function addNewExerciseFlow() {
 
-  let exName = prompt("Nombre del ejercicio (ej: Buen día con barra):");
+  let exName = await showAppInput({
+    title: "Crear ejercicio",
+    message: "Ingresá el nombre del ejercicio.",
+    placeholder: "Ej: Buen día con barra",
+    confirmText: "Crear",
+    cancelText: "Cancelar"
+  });
 
   if (!exName) return false;
 
@@ -1001,11 +1167,13 @@ function addNewExerciseFlow() {
   const finalCatalog = getFinalCatalog();
   const sections = Object.keys(finalCatalog);
 
-  let section = prompt(
-    "¿En qué sección va?\n\n" +
-    "Ejemplos: " + sections.slice(0, 6).join(", ") + "\n\n" +
-    "Escribí el nombre exacto o uno nuevo (ej: PANTORRILLAS):"
-  );
+  let section = await showAppInput({
+    title: "Sección del ejercicio",
+    message: "Escribí el nombre exacto o uno nuevo. Ejemplos: " + sections.slice(0, 6).join(", "),
+    placeholder: "Ej: PANTORRILLAS",
+    confirmText: "Guardar",
+    cancelText: "Cancelar"
+  });
 
   if (!section) return false;
 
@@ -1027,7 +1195,7 @@ function addNewExerciseFlow() {
   const alreadyExistsInUser = userCatalog[section].includes(exName);
 
   if (alreadyExistsInFinal || alreadyExistsInUser) {
-    alert("Ese ejercicio ya existe en esa sección.");
+    showAppToast("Ese ejercicio ya existe en esa sección.", "warning");
     return false;
   }
 
@@ -1035,7 +1203,7 @@ function addNewExerciseFlow() {
 
   saveUserCatalog(userCatalog);
 
-  alert("Ejercicio agregado en " + section + ":\n" + exName);
+  showAppToast("Ejercicio agregado", "success");
 
   return true;
 
@@ -1095,6 +1263,8 @@ window.addExerciseField = (dayId) => {
 
   debouncedSave();
 
+  showAppToast("Ejercicio agregado", "success");
+
   setTimeout(() => {
 
     const content = document.getElementById(`day-content-${dayId}`);
@@ -1149,8 +1319,15 @@ function setupEventListeners() {
     generarPDFRutina();
   };
 
-  document.getElementById('btn-reset-week').onclick = () => {
-    if (!confirm("¿Seguro que querés reiniciar los ejercicios de esta semana?")) return;
+  document.getElementById('btn-reset-week').onclick = async () => {
+    const ok = await showAppConfirm({
+      title: "Reiniciar semana",
+      message: "Se borrarán los datos cargados de esta semana.",
+      confirmText: "Reiniciar",
+      cancelText: "Cancelar",
+      tone: "warning"
+    });
+    if (!ok) return;
     const dias = state.rutina.semanas[state.currentWeek].dias;
     Object.keys(dias).forEach(dia => {
       dias[dia].ejercicios.forEach(ex => {
@@ -1161,6 +1338,7 @@ function setupEventListeners() {
     });
     renderApp();
     saveToStorage(true);
+    showAppToast("Semana reiniciada", "warning");
   };
 
   document.getElementById('btn-duplicate-week').onclick = () => {
@@ -1197,7 +1375,7 @@ function setupEventListeners() {
 
     state.rutina.semanas[siguienteSemana].dias = nuevosDias;
 
-    alert("Rutina duplicada a Semana " + siguienteSemana);
+    showAppToast("Rutina duplicada a Semana " + siguienteSemana, "success");
 
     renderTabs();
     saveToStorage(true);
@@ -1216,6 +1394,7 @@ function setupEventListeners() {
 
     renderApp();
     saveToStorage(true);
+    showAppToast("Día agregado", "success");
 
   };
 
@@ -1246,6 +1425,7 @@ function setupEventListeners() {
     renderTabs();
     renderApp();
     saveToStorage(true);
+    showAppToast("Semana agregada", "success");
 
   };
 
@@ -1770,9 +1950,16 @@ function generarPDFRutina() {
 /* ELIMINAR EJERCICIO                                */
 /* ================================================= */
 
-function deleteExercise(dayId, index, btn) {
+async function deleteExercise(dayId, index, btn) {
 
-  if (!confirm("Eliminar ejercicio?")) return;
+  const ok = await showAppConfirm({
+    title: "Eliminar ejercicio",
+    message: "Se eliminará este ejercicio de la rutina.",
+    confirmText: "Eliminar",
+    cancelText: "Cancelar",
+    tone: "danger"
+  });
+  if (!ok) return;
 
   const semana = state.rutina.semanas[state.currentWeek];
   const dia = semana.dias[dayId];
@@ -1797,26 +1984,34 @@ function deleteExercise(dayId, index, btn) {
 window.deleteDay = (dayId, event) => {
   // Evitamos que al hacer clic en la X se expanda/contraiga el acordeón
   if (event) event.stopPropagation();
-  if (!confirm("¿Eliminar el Día " + dayId + " por completo?")) return;
+  showAppConfirm({
+    title: "Eliminar día",
+    message: "Se eliminará este día y todos sus ejercicios. ¿Confirmás?",
+    confirmText: "Eliminar",
+    cancelText: "Cancelar",
+    tone: "danger"
+  }).then(ok => {
+    if (!ok) return;
 
-  const dias = state.rutina.semanas[state.currentWeek].dias;
+    const dias = state.rutina.semanas[state.currentWeek].dias;
 
-  // 1. Elimina el día del objeto usando la key (dayId) real
-  delete dias[dayId];
+    // 1. Elimina el día del objeto usando la key (dayId) real
+    delete dias[dayId];
 
-  // 2. Si el día eliminado era el que estaba abierto, limpiamos el estado
-  // y tratamos de abrir otro día válido para que no quede la pantalla vacía
-  if (state.openDay == dayId) {
-    state.openDay = null;
-    const diasDisponibles = Object.keys(dias);
-    if (diasDisponibles.length > 0) {
-      state.openDay = diasDisponibles[0];
+    // 2. Si el día eliminado era el que estaba abierto, limpiamos el estado
+    // y tratamos de abrir otro día válido para que no quede la pantalla vacía
+    if (state.openDay == dayId) {
+      state.openDay = null;
+      const diasDisponibles = Object.keys(dias);
+      if (diasDisponibles.length > 0) {
+        state.openDay = diasDisponibles[0];
+      }
     }
-  }
 
-  // 3. Guardar estado permanentemente y re-renderizar la interfaz
-  saveToStorage(true);
-  renderApp();
+    // 3. Guardar estado permanentemente y re-renderizar la interfaz
+    saveToStorage(true);
+    renderApp();
+  });
 };
 
 
@@ -1831,29 +2026,37 @@ window.deleteWeek = (weekId, event) => {
   const numSemanas = Object.keys(semanas).length;
 
   if (numSemanas <= 1) {
-    alert("No podés eliminar la única semana disponible.");
+    showAppToast("No podés eliminar la única semana disponible.", "warning");
     return;
   }
 
-  if (!confirm("¿Eliminar la SEMANA " + weekId + " por completo?")) return;
+  showAppConfirm({
+    title: "Eliminar semana",
+    message: "Esta acción eliminará la semana completa. ¿Confirmás?",
+    confirmText: "Eliminar",
+    cancelText: "Cancelar",
+    tone: "danger"
+  }).then(ok => {
+    if (!ok) return;
 
-  // 1. Eliminar la semana del objeto global
-  delete semanas[weekId];
+    // 1. Eliminar la semana del objeto global
+    delete semanas[weekId];
 
-  // 2. Si borramos la semana que estábamos mirando, saltamos a la primera que haya quedado
-  if (state.currentWeek == weekId) {
-    const semanasRestantes = Object.keys(semanas);
-    state.currentWeek = parseInt(semanasRestantes[0]);
-  }
+    // 2. Si borramos la semana que estábamos mirando, saltamos a la primera que haya quedado
+    if (state.currentWeek == weekId) {
+      const semanasRestantes = Object.keys(semanas);
+      state.currentWeek = parseInt(semanasRestantes[0]);
+    }
 
-  // 3. Persistir y reconstruir la pantalla
-  saveToStorage(true);
-  renderTabs();
-  renderApp();
+    // 3. Persistir y reconstruir la pantalla
+    saveToStorage(true);
+    renderTabs();
+    renderApp();
 
-  if (typeof scrollActiveWeekIntoView === "function") {
-    scrollActiveWeekIntoView();
-  }
+    if (typeof scrollActiveWeekIntoView === "function") {
+      scrollActiveWeekIntoView();
+    }
+  });
 };
 
 
@@ -2000,11 +2203,11 @@ function addWeightRecord() {
   const value = parseFloat(valueStr);
 
   if (!date) {
-    alert("Por favor, seleccioná una fecha.");
+    showAppToast("Por favor, seleccioná una fecha.", "warning");
     return;
   }
   if (isNaN(value) || value <= 0) {
-    alert("Por favor, ingresá un peso corporal válido.");
+    showAppToast("Por favor, ingresá un peso corporal válido.", "warning");
     return;
   }
 
@@ -2020,10 +2223,18 @@ function addWeightRecord() {
   renderWeightModule();
 
   valueInput.value = ""; // Limpiar input post-guardado
+  showAppToast("Peso guardado", "success");
 }
 
-window.deleteWeightRecord = function (date) {
-  if (!confirm("¿Borrar este registro?")) return;
+window.deleteWeightRecord = async function (date) {
+  const ok = await showAppConfirm({
+    title: "Eliminar registro",
+    message: "Se borrará este registro de peso corporal.",
+    confirmText: "Eliminar",
+    cancelText: "Cancelar",
+    tone: "danger"
+  });
+  if (!ok) return;
   weightLog = weightLog.filter(w => w.date !== date);
   saveWeightLog();
   renderWeightModule();
@@ -2219,7 +2430,7 @@ function handleAddProgress() {
   const valInput = document.getElementById("progress-value").value;
 
   if (!dateInput || !exInput || !valInput) {
-    alert("Completá todos los campos.");
+    showAppToast("Completá todos los campos.", "warning");
     return;
   }
 
@@ -2243,20 +2454,28 @@ function handleAddProgress() {
   filterSelect.value = exInput; // Autofiltrar por el recien agregado (muy útil)
 
   renderProgressUI();
+  showAppToast("Registro agregado", "success");
 }
 
-window.deleteProgressRecord = (id) => {
-  if (confirm("¿Eliminar este registro?")) {
-    progressData = progressData.filter(r => r.id !== id);
-    saveProgressData();
+window.deleteProgressRecord = async (id) => {
+  const ok = await showAppConfirm({
+    title: "Eliminar registro",
+    message: "Se eliminará este registro de progreso.",
+    confirmText: "Eliminar",
+    cancelText: "Cancelar",
+    tone: "danger"
+  });
+  if (!ok) return;
 
-    const filterSelect = document.getElementById("progress-filter-select");
-    const prevFilter = filterSelect.value;
-    loadExerciseSelects();
-    filterSelect.value = prevFilter;
+  progressData = progressData.filter(r => r.id !== id);
+  saveProgressData();
 
-    renderProgressUI();
-  }
+  const filterSelect = document.getElementById("progress-filter-select");
+  const prevFilter = filterSelect.value;
+  loadExerciseSelects();
+  filterSelect.value = prevFilter;
+
+  renderProgressUI();
 };
 
 
