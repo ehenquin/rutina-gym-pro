@@ -264,6 +264,34 @@ function showPlanMessage(text, type = "info") {
   message.style.color = type === "error" ? "#d11" : "#0a8f4b";
 }
 
+function normalizeAdminWhatsappNumber(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  if (!digits) return "";
+  if (digits.startsWith("54")) return digits;
+  return "54" + digits;
+}
+
+async function openAdminWhatsappForReceipt() {
+  const data = await appsScriptRequest("obtenerTelefonoAdmin", {});
+
+  if (data?.ok !== true) {
+    showPlanMessage("No hay teléfono de administrador configurado.", "error");
+    return false;
+  }
+
+  const telefonoAdmin = normalizeAdminWhatsappNumber(data.telefonoAdmin);
+
+  if (!telefonoAdmin) {
+    showPlanMessage("No hay teléfono de administrador configurado.", "error");
+    return false;
+  }
+
+  const mensaje = "Hola, ya transferí el Plan PRO de Rutina Gym. Te adjunto el comprobante.";
+  const url = "https://wa.me/" + telefonoAdmin + "?text=" + encodeURIComponent(mensaje);
+  window.open(url, "_blank", "noopener");
+  return true;
+}
+
 function getLoginBlockMessage(user, data) {
   const apiMessage = data?.motivo || data?.message || data?.error;
   const estado = normalizeAuthValue(user?.estado || data?.estado);
@@ -1507,6 +1535,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data?.ok === true) {
         showPlanMessage("Solicitud enviada correctamente. Revisaremos el pago y activaremos tu cuenta.");
         if (aliasInput) aliasInput.value = "";
+
+        const whatsappOpened = await openAdminWhatsappForReceipt();
+        if (!whatsappOpened) return;
 
         setTimeout(() => {
           const modal = document.getElementById("plan-modal");
