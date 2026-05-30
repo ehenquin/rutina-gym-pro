@@ -39,7 +39,7 @@ async function appsScriptRequest(action, payload) {
 
   const res = await fetch(buildAppsScriptActionUrl(action), {
     method: "POST",
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 
   const raw = await res.text();
@@ -116,10 +116,10 @@ function showAppConfirm(options = {}) {
     message = "",
     confirmText = "Aceptar",
     cancelText = "Cancelar",
-    tone = "primary"
+    tone = "primary",
   } = options;
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "app-modal-overlay";
     overlay.innerHTML = `
@@ -143,12 +143,16 @@ function showAppConfirm(options = {}) {
     cancelBtn.textContent = cancelText;
     confirmBtn.textContent = confirmText;
 
-    cancelBtn.addEventListener("click", () => closeAppModal(overlay, false, resolve));
-    confirmBtn.addEventListener("click", () => closeAppModal(overlay, true, resolve));
-    overlay.addEventListener("click", event => {
+    cancelBtn.addEventListener("click", () =>
+      closeAppModal(overlay, false, resolve),
+    );
+    confirmBtn.addEventListener("click", () =>
+      closeAppModal(overlay, true, resolve),
+    );
+    overlay.addEventListener("click", (event) => {
       if (event.target === overlay) closeAppModal(overlay, false, resolve);
     });
-    overlay.addEventListener("keydown", event => {
+    overlay.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closeAppModal(overlay, false, resolve);
       if (event.key === "Enter") closeAppModal(overlay, true, resolve);
     });
@@ -166,10 +170,10 @@ function showAppInput(options = {}) {
     value = "",
     placeholder = "",
     confirmText = "Aceptar",
-    cancelText = "Cancelar"
+    cancelText = "Cancelar",
   } = options;
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "app-modal-overlay";
     overlay.innerHTML = `
@@ -197,12 +201,16 @@ function showAppInput(options = {}) {
     cancelBtn.textContent = cancelText;
     confirmBtn.textContent = confirmText;
 
-    cancelBtn.addEventListener("click", () => closeAppModal(overlay, null, resolve));
-    confirmBtn.addEventListener("click", () => closeAppModal(overlay, input.value, resolve));
-    overlay.addEventListener("click", event => {
+    cancelBtn.addEventListener("click", () =>
+      closeAppModal(overlay, null, resolve),
+    );
+    confirmBtn.addEventListener("click", () =>
+      closeAppModal(overlay, input.value, resolve),
+    );
+    overlay.addEventListener("click", (event) => {
       if (event.target === overlay) closeAppModal(overlay, null, resolve);
     });
-    overlay.addEventListener("keydown", event => {
+    overlay.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closeAppModal(overlay, null, resolve);
       if (event.key === "Enter") closeAppModal(overlay, input.value, resolve);
     });
@@ -241,7 +249,7 @@ function downloadPdfBlob(pdfBlob, fileName) {
 }
 
 function showPdfReadyModal({ pdfBlob, fileName }) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const overlay = document.createElement("div");
     overlay.className = "app-modal-overlay";
     overlay.innerHTML = `
@@ -263,27 +271,35 @@ function showPdfReadyModal({ pdfBlob, fileName }) {
       showAppToast("PDF descargado.", "success");
     };
 
-    overlay.querySelector('[data-action="download"]').addEventListener("click", () => {
-      download();
-    });
+    overlay
+      .querySelector('[data-action="download"]')
+      .addEventListener("click", () => {
+        download();
+      });
 
-    overlay.querySelector('[data-action="whatsapp"]').addEventListener("click", () => {
-      downloadPdfBlob(pdfBlob, fileName);
-      window.open("https://web.whatsapp.com/", "_blank", "noopener");
-      showAppToast("Adjuntá manualmente el PDF descargado.", "info");
-    });
+    overlay
+      .querySelector('[data-action="whatsapp"]')
+      .addEventListener("click", () => {
+        downloadPdfBlob(pdfBlob, fileName);
+        window.open("https://web.whatsapp.com/", "_blank", "noopener");
+        showAppToast("Adjuntá manualmente el PDF descargado.", "info");
+      });
 
-    overlay.querySelector('[data-action="telegram"]').addEventListener("click", () => {
-      downloadPdfBlob(pdfBlob, fileName);
-      window.open("https://web.telegram.org/", "_blank", "noopener");
-      showAppToast("Adjuntá manualmente el PDF descargado.", "info");
-    });
+    overlay
+      .querySelector('[data-action="telegram"]')
+      .addEventListener("click", () => {
+        downloadPdfBlob(pdfBlob, fileName);
+        window.open("https://web.telegram.org/", "_blank", "noopener");
+        showAppToast("Adjuntá manualmente el PDF descargado.", "info");
+      });
 
-    overlay.querySelector('[data-action="close"]').addEventListener("click", closeModal);
-    overlay.addEventListener("click", event => {
+    overlay
+      .querySelector('[data-action="close"]')
+      .addEventListener("click", closeModal);
+    overlay.addEventListener("click", (event) => {
       if (event.target === overlay) closeModal();
     });
-    overlay.addEventListener("keydown", event => {
+    overlay.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closeModal();
     });
 
@@ -298,12 +314,18 @@ function showAuthPanel(panel) {
   const registerForm = document.getElementById("register-form");
 
   if (loginForm) loginForm.style.display = panel === "login" ? "block" : "none";
-  if (registerForm) registerForm.style.display = panel === "register" ? "block" : "none";
+  if (registerForm)
+    registerForm.style.display = panel === "register" ? "block" : "none";
   showAuthMessage("");
 }
 
 function getAuthSuccess(data) {
-  return data?.ok === true || data?.success === true || data?.login === true || data?.registered === true;
+  return (
+    data?.ok === true ||
+    data?.success === true ||
+    data?.login === true ||
+    data?.registered === true
+  );
 }
 
 function getAuthUser(data) {
@@ -318,12 +340,14 @@ function getFriendlyAuthMessage(message, fallback) {
   const code = normalizeAuthValue(message);
 
   const messages = {
-    SIN_FECHA_VENCIMIENTO: "Tu cuenta todavía no tiene una fecha de acceso asignada.",
+    SIN_FECHA_VENCIMIENTO:
+      "Tu cuenta todavía no tiene una fecha de acceso asignada.",
     PAGO_PENDIENTE: "Tu pago está pendiente. Consultá con el administrador.",
-    CUENTA_PENDIENTE: "Tu cuenta está pendiente de aprobación por el administrador.",
+    CUENTA_PENDIENTE:
+      "Tu cuenta está pendiente de aprobación por el administrador.",
     PENDIENTE: "Tu cuenta está pendiente de aprobación por el administrador.",
     BLOQUEADO: "Tu cuenta está bloqueada. Consultá con el administrador.",
-    VENCIDO: "Tu acceso está vencido. Consultá con el administrador."
+    VENCIDO: "Tu acceso está vencido. Consultá con el administrador.",
   };
 
   if (messages[code]) return messages[code];
@@ -345,7 +369,12 @@ function getStoredUsuario() {
 
 function getUsuarioField(usuario, keys) {
   for (const key of keys) {
-    if (usuario && usuario[key] !== undefined && usuario[key] !== null && usuario[key] !== "") {
+    if (
+      usuario &&
+      usuario[key] !== undefined &&
+      usuario[key] !== null &&
+      usuario[key] !== ""
+    ) {
       return usuario[key];
     }
   }
@@ -355,20 +384,37 @@ function getUsuarioField(usuario, keys) {
 
 function parseFechaUsuario(value) {
   if (!value) return null;
-
   if (value instanceof Date) return value;
 
-  const raw = value.toString().trim();
-  const parts = raw.split("/");
+  const raw = String(value).trim();
 
-  if (parts.length === 3) {
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1;
-    const year = parseInt(parts[2], 10);
-    return new Date(year, month, day);
+  let match = raw.match(
+    /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/,
+  );
+
+  if (match) {
+    const day = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    const year = Number(match[3]);
+    const hour = Number(match[4] || 23);
+    const minute = Number(match[5] || 59);
+    const second = Number(match[6] || 59);
+
+    return new Date(year, month, day, hour, minute, second);
   }
 
-  return new Date(raw);
+  match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if (match) {
+    const year = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    const day = Number(match[3]);
+
+    return new Date(year, month, day, 23, 59, 59);
+  }
+
+  const parsed = new Date(raw);
+  return isNaN(parsed.getTime()) ? null : parsed;
 }
 
 function calcularDiasRestantes(fecha) {
@@ -389,57 +435,97 @@ function actualizarDiasHeaderDesdeUsuario() {
   const el = document.getElementById("dias-restantes");
   if (!el) return true;
 
-  const estado = normalizeAuthValue(getUsuarioField(usuario, ["Estado", "estado"]));
+  const estado = normalizeAuthValue(
+    getUsuarioField(usuario, ["Estado", "estado"]),
+  );
   const pago = normalizeAuthValue(getUsuarioField(usuario, ["Pago", "pago"]));
   const fechaVencimientoRaw = getUsuarioField(usuario, [
     "FechaVencimiento",
     "fechaVencimiento",
     "fecha_vencimiento",
-    "expira"
+    "expira",
   ]);
 
+  function setDiasText(texto, color) {
+    el.innerText = texto;
+    el.style.color = color;
+    el.style.fontWeight = "700";
+    el.style.lineHeight = "1.15";
+  }
+
   if (estado === "BLOQUEADO") {
-    el.innerText = "Acceso bloqueado";
-    el.style.color = "#d11";
+    setDiasText("Acceso bloqueado", "#d11");
     return true;
   }
 
   if (estado === "VENCIDO") {
-    el.innerText = "Acceso vencido";
-    el.style.color = "#d11";
+    setDiasText("Acceso vencido", "#d11");
     return true;
   }
 
   if (estado === "PENDIENTE") {
-    el.innerText = "Pendiente de aprobación";
-    el.style.color = "#d11";
+    setDiasText("Pendiente de aprobación", "#d11");
     return true;
   }
 
   const fechaVencimiento = parseFechaUsuario(fechaVencimientoRaw);
-  const diasRestantes = calcularDiasRestantes(fechaVencimiento);
 
-  if (estado === "PRUEBA") {
-    if (diasRestantes === null) {
-      el.innerText = "Prueba sin fecha asignada";
-      el.style.color = "#d11";
+  if (!fechaVencimiento || isNaN(fechaVencimiento.getTime())) {
+    if (estado === "PRUEBA") {
+      setDiasText("Prueba sin fecha", "#d11");
       return true;
     }
 
-    el.innerText = diasRestantes === 1 ? "Falta 1 día de prueba" : `Faltan ${diasRestantes} días de prueba`;
-    el.style.color = diasRestantes <= 0 ? "#d11" : "#444";
+    if (estado === "ACTIVO" && pago === "SI") {
+      setDiasText("", "#444");
+      return true;
+    }
+
+    return false;
+  }
+
+  const ahora = new Date();
+  const msRestantes = fechaVencimiento.getTime() - ahora.getTime();
+  const horasRestantes = Math.ceil(msRestantes / (1000 * 60 * 60));
+  const diasRestantes = Math.max(1, Math.round(horasRestantes / 24));
+
+  if (msRestantes <= 0) {
+    if (estado === "PRUEBA") {
+      setDiasText("Prueba vencida", "#d11");
+      return true;
+    }
+
+    if (estado === "ACTIVO" && pago === "SI") {
+      setDiasText("Acceso vencido", "#d11");
+      return true;
+    }
+  }
+
+  if (estado === "PRUEBA") {
+    if (horasRestantes < 24) {
+      setDiasText(`Faltan ${horasRestantes} h de prueba`, "#444");
+      return true;
+    }
+
+    setDiasText(
+      diasRestantes === 1
+        ? "Falta 1 día de prueba"
+        : `Faltan ${diasRestantes} días de prueba`,
+      "#444",
+    );
     return true;
   }
 
   if (estado === "ACTIVO" && pago === "SI") {
-    if (diasRestantes === null) {
-      el.innerText = "";
-      el.style.color = "#444";
+    if (horasRestantes < 24) {
+      setDiasText(`Quedan ${horasRestantes} h`, "#0a8f4b");
       return true;
     }
 
-    el.innerText = diasRestantes === 1 ? "1 día restante" : `${diasRestantes} días restantes`;
-    el.style.color = diasRestantes <= 0 ? "#d11" : "#0a8f4b";
+    setDiasText(
+      diasRestantes === 1 ? "Queda 1 día" : `Quedan ${diasRestantes} días`,
+      "#0a8f4b",
+    );
     return true;
   }
 
@@ -504,8 +590,10 @@ async function openAdminWhatsappForReceipt() {
     return false;
   }
 
-  const mensaje = "Hola, ya transferí el Plan PRO de Rutina Gym. Te adjunto el comprobante.";
-  const url = "https://wa.me/" + telefonoAdmin + "?text=" + encodeURIComponent(mensaje);
+  const mensaje =
+    "Hola, ya transferí el Plan PRO de Rutina Gym. Te adjunto el comprobante.";
+  const url =
+    "https://wa.me/" + telefonoAdmin + "?text=" + encodeURIComponent(mensaje);
   window.open(url, "_blank", "noopener");
   return true;
 }
@@ -515,14 +603,24 @@ function getLoginBlockMessage(user, data) {
   const estado = normalizeAuthValue(user?.estado || data?.estado);
   const rol = normalizeAuthValue(user?.rol || data?.rol);
   const pago = normalizeAuthValue(user?.pago || data?.pago);
-  const acceso = data?.acceso === true || data?.acceso === "true" || user?.acceso === true || user?.acceso === "true";
+  const acceso =
+    data?.acceso === true ||
+    data?.acceso === "true" ||
+    user?.acceso === true ||
+    user?.acceso === "true";
 
   if (estado === "BLOQUEADO") {
-    return getFriendlyAuthMessage(apiMessage, "Tu cuenta está bloqueada. Consultá con el administrador.");
+    return getFriendlyAuthMessage(
+      apiMessage,
+      "Tu cuenta está bloqueada. Consultá con el administrador.",
+    );
   }
 
   if (estado === "VENCIDO") {
-    return getFriendlyAuthMessage(apiMessage, "Tu acceso está vencido. Consultá con el administrador.");
+    return getFriendlyAuthMessage(
+      apiMessage,
+      "Tu acceso está vencido. Consultá con el administrador.",
+    );
   }
 
   if (rol === "ADMIN") return "";
@@ -532,23 +630,42 @@ function getLoginBlockMessage(user, data) {
   }
 
   if (data?.acceso === false || data?.acceso === "false") {
-    return getFriendlyAuthMessage(apiMessage, "Tu acceso no está habilitado. Consultá con tu entrenador.");
+    return getFriendlyAuthMessage(
+      apiMessage,
+      "Tu acceso no está habilitado. Consultá con tu entrenador.",
+    );
   }
 
   if (user?.acceso === false || user?.acceso === "false") {
-    return getFriendlyAuthMessage(apiMessage, "Tu acceso no está habilitado. Consultá con tu entrenador.");
+    return getFriendlyAuthMessage(
+      apiMessage,
+      "Tu acceso no está habilitado. Consultá con tu entrenador.",
+    );
   }
 
   if (estado === "PRUEBA") {
-    return acceso ? "" : getFriendlyAuthMessage(apiMessage, "Tu prueba no está habilitada o está vencida.");
+    return acceso
+      ? ""
+      : getFriendlyAuthMessage(
+          apiMessage,
+          "Tu prueba no está habilitada o está vencida.",
+        );
   }
 
   if (estado === "ACTIVO") {
-    return pago === "SI" ? "" : getFriendlyAuthMessage(apiMessage, "Tu pago está pendiente. Consultá con el administrador.");
+    return pago === "SI"
+      ? ""
+      : getFriendlyAuthMessage(
+          apiMessage,
+          "Tu pago está pendiente. Consultá con el administrador.",
+        );
   }
 
   if (estado !== "ACTIVO") {
-    return getFriendlyAuthMessage(apiMessage, "Tu cuenta está pendiente de aprobación por el administrador.");
+    return getFriendlyAuthMessage(
+      apiMessage,
+      "Tu cuenta está pendiente de aprobación por el administrador.",
+    );
   }
 
   return "";
@@ -563,7 +680,8 @@ function enterAppAfterLogin(user) {
   localStorage.setItem("usuario", JSON.stringify(user));
 
   if (user?.telefono) localStorage.setItem("telefono", user.telefono);
-  if (user?.session_token) localStorage.setItem("session_token", user.session_token);
+  if (user?.session_token)
+    localStorage.setItem("session_token", user.session_token);
   if (user?.token) localStorage.setItem("session_token", user.token);
 
   const loginScreen = document.getElementById("login-screen");
@@ -592,7 +710,10 @@ async function handleAppsScriptLogin() {
     if (user && !user.telefono) user.telefono = telefono;
 
     if (!getAuthSuccess(data)) {
-      showAuthMessage(data?.error || data?.message || "No se pudo iniciar sesión.", true);
+      showAuthMessage(
+        data?.error || data?.message || "No se pudo iniciar sesión.",
+        true,
+      );
       return;
     }
 
@@ -615,9 +736,18 @@ async function handleAppsScriptRegister() {
   const mail = document.getElementById("register-mail")?.value.trim();
   const telefono = document.getElementById("register-phone")?.value.trim();
   const password = document.getElementById("register-password")?.value;
-  const confirmarPassword = document.getElementById("register-password-confirm")?.value;
+  const confirmarPassword = document.getElementById(
+    "register-password-confirm",
+  )?.value;
 
-  if (!nombre || !apellido || !mail || !telefono || !password || !confirmarPassword) {
+  if (
+    !nombre ||
+    !apellido ||
+    !mail ||
+    !telefono ||
+    !password ||
+    !confirmarPassword
+  ) {
     showAuthMessage("Completá todos los campos.", true);
     return;
   }
@@ -634,16 +764,21 @@ async function handleAppsScriptRegister() {
       apellido,
       mail,
       telefono,
-      password
+      password,
     });
 
     if (!getAuthSuccess(data)) {
-      showAuthMessage(data?.error || data?.message || "No se pudo registrar.", true);
+      showAuthMessage(
+        data?.error || data?.message || "No se pudo registrar.",
+        true,
+      );
       return;
     }
 
     const registerPassword = document.getElementById("register-password");
-    const registerPasswordConfirm = document.getElementById("register-password-confirm");
+    const registerPasswordConfirm = document.getElementById(
+      "register-password-confirm",
+    );
 
     if (registerPassword) registerPassword.value = "";
     if (registerPasswordConfirm) registerPasswordConfirm.value = "";
@@ -651,7 +786,9 @@ async function handleAppsScriptRegister() {
     showAuthPanel("login");
     const loginPhone = document.getElementById("login-phone");
     if (loginPhone) loginPhone.value = telefono;
-    showAuthMessage("Registro recibido. Tu cuenta queda pendiente de aprobación por el administrador.");
+    showAuthMessage(
+      "Registro recibido. Tu cuenta queda pendiente de aprobación por el administrador.",
+    );
   } catch (err) {
     console.error("[APPS SCRIPT] register error", err);
     showAuthMessage(err.message || "Error de conexión.", true);
@@ -666,7 +803,8 @@ function setupAppsScriptAuth() {
 
   if (btnLogin) btnLogin.onclick = handleAppsScriptLogin;
   if (btnRegister) btnRegister.onclick = handleAppsScriptRegister;
-  if (btnShowRegister) btnShowRegister.onclick = () => showAuthPanel("register");
+  if (btnShowRegister)
+    btnShowRegister.onclick = () => showAuthPanel("register");
   if (btnShowLogin) btnShowLogin.onclick = () => showAuthPanel("login");
 }
 
@@ -681,71 +819,82 @@ const SAVE_DEBOUNCE_MS = 500;
 
 // --- EXERCISE CATALOG ---
 const BASE_CATALOG = {
-  "PECHO": ["Press banca plano", "Aperturas con mancuernas", "Fondos en paralelas", "Pullover"],
-  "ESPALDA": ["Dominadas", "Remo con barra", "Jalón al pecho", "Remo con mancuerna"],
-  "HOMBROS": ["Press militar", "Elevaciones laterales", "Pájaros (posterior)", "Frontal mancuerna"],
-  "PIERNAS": ["Sentadilla", "Prensa", "Peso muerto rumano", "Extensión cuádriceps"],
-  "BÍCEPS": ["Curl con barra", "Curl alternado", "Curl martillo", "Curl concentrado"],
-  "TRÍCEPS": ["Press francés", "Extensión polea", "Fondos banco", "Patada tríceps"],
-  "GLÚTEOS": ["Hip thrust", "Patada polea", "Sentadilla sumo", "Puente glúteo"],
-  "ABDOMEN": ["Crunch", "Plancha", "Elevación piernas", "Rueda abdominal"]
+  PECHO: [
+    "Press banca plano",
+    "Aperturas con mancuernas",
+    "Fondos en paralelas",
+    "Pullover",
+  ],
+  ESPALDA: [
+    "Dominadas",
+    "Remo con barra",
+    "Jalón al pecho",
+    "Remo con mancuerna",
+  ],
+  HOMBROS: [
+    "Press militar",
+    "Elevaciones laterales",
+    "Pájaros (posterior)",
+    "Frontal mancuerna",
+  ],
+  PIERNAS: [
+    "Sentadilla",
+    "Prensa",
+    "Peso muerto rumano",
+    "Extensión cuádriceps",
+  ],
+  BÍCEPS: [
+    "Curl con barra",
+    "Curl alternado",
+    "Curl martillo",
+    "Curl concentrado",
+  ],
+  TRÍCEPS: [
+    "Press francés",
+    "Extensión polea",
+    "Fondos banco",
+    "Patada tríceps",
+  ],
+  GLÚTEOS: ["Hip thrust", "Patada polea", "Sentadilla sumo", "Puente glúteo"],
+  ABDOMEN: ["Crunch", "Plancha", "Elevación piernas", "Rueda abdominal"],
 };
-
 
 const USER_CATALOG_KEY = "gym_custom_catalog_v1";
 
 function loadUserCatalog() {
-
   const data = localStorage.getItem(USER_CATALOG_KEY);
 
   if (!data) return {};
 
   try {
-
     return JSON.parse(data);
-
   } catch {
-
     return {};
-
   }
-
 }
 
 function saveUserCatalog(catalog) {
-
   localStorage.setItem(USER_CATALOG_KEY, JSON.stringify(catalog));
-
 }
 
 function getFinalCatalog() {
-
   const userCatalog = loadUserCatalog();
 
   const finalCatalog = JSON.parse(JSON.stringify(BASE_CATALOG));
 
-  Object.keys(userCatalog).forEach(section => {
-
+  Object.keys(userCatalog).forEach((section) => {
     if (!finalCatalog[section]) {
-
       finalCatalog[section] = [];
-
     }
 
-    userCatalog[section].forEach(ex => {
-
+    userCatalog[section].forEach((ex) => {
       if (!finalCatalog[section].includes(ex)) {
-
         finalCatalog[section].push(ex);
-
       }
-
     });
-
   });
 
   return finalCatalog;
-
 }
 
 function escapeHtml(value) {
@@ -769,8 +918,26 @@ function getExerciseGroup(exerciseName) {
   return "";
 }
 
+function createUserCatalogSection(sectionName) {
+  const section = (sectionName || "").trim().toUpperCase();
+  if (!section) return null;
+
+  const finalCatalog = getFinalCatalog();
+  if (finalCatalog[section]) {
+    showAppToast("Esa sección ya existe.", "warning");
+    return null;
+  }
+
+  const userCatalog = loadUserCatalog();
+  userCatalog[section] = [];
+  saveUserCatalog(userCatalog);
+  showAppToast("Sección agregada", "success");
+  return section;
+}
+
 function setExerciseName(dayId, index, exerciseName) {
-  const exercise = state.rutina.semanas[state.currentWeek].dias[dayId].ejercicios[index];
+  const exercise =
+    state.rutina.semanas[state.currentWeek].dias[dayId].ejercicios[index];
   exercise.nombre = exerciseName;
   exercise.grupo = getExerciseGroup(exerciseName);
   debouncedSave();
@@ -783,7 +950,7 @@ function openExercisePicker(options = {}) {
     allowedNames = null,
     includeClear = false,
     clearText = "Sin filtro",
-    showCreateActions = false
+    showCreateActions = false,
   } = options;
 
   const overlay = document.createElement("div");
@@ -805,9 +972,14 @@ function openExercisePicker(options = {}) {
   const listEl = overlay.querySelector(".exercise-picker-list");
   const allowedSet = Array.isArray(allowedNames) ? new Set(allowedNames) : null;
 
-  const closePicker = () => {
+  const closePicker = (afterClose) => {
     overlay.classList.remove("is-visible");
-    setTimeout(() => overlay.remove(), 160);
+    setTimeout(() => {
+      overlay.remove();
+      if (typeof afterClose === "function") {
+        afterClose();
+      }
+    }, 160);
   };
 
   const selectExercise = (name) => {
@@ -834,30 +1006,42 @@ function openExercisePicker(options = {}) {
 
     Object.entries(catalog).forEach(([grupo, items]) => {
       const groupMatches = grupo.toLowerCase().includes(query);
-      const filteredItems = items.filter(item => {
+      const sectionItems = Array.isArray(items) ? items : [];
+      const filteredItems = sectionItems.filter((item) => {
         if (allowedSet && !allowedSet.has(item)) return false;
         const itemMatches = item.toLowerCase().includes(query);
         return !query || groupMatches || itemMatches;
       });
+      const showEmptyGroup =
+        sectionItems.length === 0 && !allowedSet && (!query || groupMatches);
 
-      if (filteredItems.length === 0) return;
+      if (filteredItems.length === 0 && !showEmptyGroup) return;
 
-      total += filteredItems.length;
+      total += filteredItems.length || 1;
       html += `
         <div class="exercise-picker-group">
           <div class="exercise-picker-group-title">${escapeHtml(grupo)}</div>
-          ${filteredItems.map(item => `
+          ${
+            showEmptyGroup
+              ? `<div class="exercise-picker-empty-inline">Sin ejercicios todavía</div>`
+              : filteredItems
+                  .map(
+                    (item) => `
             <button type="button" class="exercise-picker-option ${item === currentValue ? "active" : ""}" data-name="${escapeHtml(item)}">
               ${escapeHtml(item)}
             </button>
-          `).join("")}
+          `,
+                  )
+                  .join("")
+          }
         </div>
       `;
     });
 
-    listEl.innerHTML = total > 0
-      ? html
-      : `<div class="exercise-picker-empty">No se encontraron ejercicios.</div>`;
+    listEl.innerHTML =
+      total > 0
+        ? html
+        : `<div class="exercise-picker-empty">No se encontraron ejercicios.</div>`;
   };
 
   if (showCreateActions) {
@@ -866,25 +1050,41 @@ function openExercisePicker(options = {}) {
       <button type="button" class="exercise-picker-action" data-action="exercise">+ Crear ejercicio</button>
     `;
 
-    actionsEl.querySelector('[data-action="section"]').addEventListener("click", async () => {
-      const ok = await addNewSectionFlow();
-      if (ok) renderList();
-    });
+    actionsEl
+      .querySelector('[data-action="section"]')
+      .addEventListener("click", async () => {
+        closePicker(async () => {
+          const ok = await addNewSectionFlow();
+          openExercisePicker({
+            ...options,
+            currentValue,
+          });
+        });
+      });
 
-    actionsEl.querySelector('[data-action="exercise"]').addEventListener("click", async () => {
-      const created = await addNewExerciseFlow();
-      if (created) renderList();
-    });
+    actionsEl
+      .querySelector('[data-action="exercise"]')
+      .addEventListener("click", async () => {
+        closePicker(async () => {
+          const created = await addNewExerciseFlow();
+          openExercisePicker({
+            ...options,
+            currentValue,
+          });
+        });
+      });
   }
 
-  overlay.querySelector(".exercise-picker-close").addEventListener("click", closePicker);
-  overlay.addEventListener("click", event => {
+  overlay
+    .querySelector(".exercise-picker-close")
+    .addEventListener("click", closePicker);
+  overlay.addEventListener("click", (event) => {
     if (event.target === overlay) closePicker();
   });
-  overlay.addEventListener("keydown", event => {
+  overlay.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closePicker();
   });
-  listEl.addEventListener("click", event => {
+  listEl.addEventListener("click", (event) => {
     const option = event.target.closest(".exercise-picker-option");
     if (!option) return;
     selectExercise(option.dataset.name || "");
@@ -897,6 +1097,127 @@ function openExercisePicker(options = {}) {
   searchInput.focus();
 }
 
+function openSectionPicker(options = {}) {
+  const { currentValue = "", onSelect, onCancel, allowCreate = false } = options;
+
+  const overlay = document.createElement("div");
+  overlay.className = "exercise-picker-overlay section-picker-overlay";
+  overlay.innerHTML = `
+    <div class="exercise-picker-panel section-picker-panel" role="dialog" aria-modal="true" aria-labelledby="section-picker-title">
+      <div class="exercise-picker-header">
+        <h2 id="section-picker-title">Elegir sección</h2>
+        <button type="button" class="exercise-picker-close" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <input class="exercise-picker-search" type="search" placeholder="Buscar sección..." autocomplete="off">
+      <div class="exercise-picker-actions"></div>
+      <div class="exercise-picker-list"></div>
+    </div>
+  `;
+
+  const searchInput = overlay.querySelector(".exercise-picker-search");
+  const actionsEl = overlay.querySelector(".exercise-picker-actions");
+  const listEl = overlay.querySelector(".exercise-picker-list");
+
+  const closePicker = (afterClose) => {
+    overlay.classList.remove("is-visible");
+    setTimeout(() => {
+      overlay.remove();
+      if (typeof afterClose === "function") {
+        afterClose();
+      }
+    }, 160);
+  };
+
+  const selectSection = (section) => {
+    if (typeof onSelect === "function") {
+      onSelect(section);
+    }
+    closePicker();
+  };
+
+  const cancelPicker = () => {
+    if (typeof onCancel === "function") {
+      onCancel();
+    }
+    closePicker();
+  };
+
+  const renderList = () => {
+    const query = searchInput.value.trim().toLowerCase();
+    const sections = Object.keys(getFinalCatalog()).filter((section) => {
+      return !query || section.toLowerCase().includes(query);
+    });
+
+    listEl.innerHTML =
+      sections.length > 0
+        ? sections
+            .map(
+              (section) => `
+          <button type="button" class="exercise-picker-option section-picker-option ${section === currentValue ? "active" : ""}" data-section="${escapeHtml(section)}">
+            ${escapeHtml(section)}
+          </button>
+        `,
+            )
+            .join("")
+        : `<div class="exercise-picker-empty">No se encontraron secciones.</div>`;
+  };
+
+  if (allowCreate) {
+    actionsEl.innerHTML = `
+      <button type="button" class="exercise-picker-action" data-action="section">+ Crear sección</button>
+    `;
+
+    actionsEl
+      .querySelector('[data-action="section"]')
+      .addEventListener("click", () => {
+        closePicker(async () => {
+          const sectionName = await showAppInput({
+            title: "Crear sección",
+            message: "Ingresá el nombre de la sección nueva.",
+            placeholder: "Ej: PANTORRILLAS",
+            confirmText: "Crear",
+            cancelText: "Cancelar",
+          });
+
+          if (!sectionName) {
+            openSectionPicker(options);
+            return;
+          }
+
+          const createdSection = createUserCatalogSection(sectionName);
+          if (createdSection) {
+            if (typeof onSelect === "function") {
+              onSelect(createdSection);
+            }
+            return;
+          }
+
+          openSectionPicker(options);
+        });
+      });
+  }
+
+  overlay
+    .querySelector(".exercise-picker-close")
+    .addEventListener("click", cancelPicker);
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) cancelPicker();
+  });
+  overlay.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") cancelPicker();
+  });
+  listEl.addEventListener("click", (event) => {
+    const option = event.target.closest(".section-picker-option");
+    if (!option) return;
+    selectSection(option.dataset.section || "");
+  });
+  searchInput.addEventListener("input", renderList);
+
+  document.body.appendChild(overlay);
+  renderList();
+  requestAnimationFrame(() => overlay.classList.add("is-visible"));
+  searchInput.focus();
+}
 
 // Sistema de licencias antiguo eliminado
 
@@ -906,8 +1227,8 @@ let state = {
   openDay: 1,
   rutina: {
     meta: { version: APP_VERSION, updatedAt: null },
-    semanas: {}
-  }
+    semanas: {},
+  },
 };
 
 let saveTimeout = null;
@@ -928,15 +1249,15 @@ function init() {
   renderApp();
   setupEventListeners();
 
-  document.body.addEventListener('click', (e) => {
-    if (e.target && e.target.tagName === "BUTTON" && typeof hapticTap === 'function') {
+  document.body.addEventListener("click", (e) => {
+    if (
+      e.target &&
+      e.target.tagName === "BUTTON" &&
+      typeof hapticTap === "function"
+    ) {
       hapticTap();
     }
   });
-
-
-
-
 
   // updateDiasRestantes(); // COMENTADO PARA NO ROMPER TEXTO DEL HEADER
 
@@ -948,12 +1269,7 @@ function init() {
   verificarModoTester(); // LLAMADA AL MODO TESTER
 }
 
-
-
 // Sincronización manejada por startUserAccessSync()
-
-
-
 
 function seedInitialData() {
   for (let w = 1; w <= 3; w++) {
@@ -963,11 +1279,17 @@ function seedInitialData() {
       for (let e = 0; e < DEFAULT_EX_PER_DAY; e++) {
         // Seed some examples for W1 D1
         if (w === 1 && d === 1 && e === 0) {
-          state.rutina.semanas[w].dias[d].ejercicios.push(createExerciseObject("Press banca plano", "PECHO", 4, "5.5.6.6"));
+          state.rutina.semanas[w].dias[d].ejercicios.push(
+            createExerciseObject("Press banca plano", "PECHO", 4, "5.5.6.6"),
+          );
         } else if (w === 1 && d === 1 && e === 1) {
-          state.rutina.semanas[w].dias[d].ejercicios.push(createExerciseObject("Remo con barra", "ESPALDA", 3, "8"));
+          state.rutina.semanas[w].dias[d].ejercicios.push(
+            createExerciseObject("Remo con barra", "ESPALDA", 3, "8"),
+          );
         } else {
-          state.rutina.semanas[w].dias[d].ejercicios.push(createExerciseObject());
+          state.rutina.semanas[w].dias[d].ejercicios.push(
+            createExerciseObject(),
+          );
         }
       }
     }
@@ -975,36 +1297,39 @@ function seedInitialData() {
   saveToStorage(true);
 }
 
-function createExerciseObject(nombre = "", grupo = "", series = "", reps = "", peso = "") {
+function createExerciseObject(
+  nombre = "",
+  grupo = "",
+  series = "",
+  reps = "",
+  peso = "",
+) {
   return {
-    id: crypto.randomUUID ? crypto.randomUUID() : Date.now() + Math.random().toString(36),
+    id: crypto.randomUUID
+      ? crypto.randomUUID()
+      : Date.now() + Math.random().toString(36),
     nombre,
     grupo,
     series,
     reps,
-    peso
+    peso,
   };
 }
 
-
 function generateRoutineText() {
-
   let text = "🏋️ Rutina Gym\n\n";
 
   const semanas = state.rutina.semanas;
 
-  Object.keys(semanas).forEach(w => {
-
+  Object.keys(semanas).forEach((w) => {
     text += "SEMANA " + w + "\n";
 
     const dias = semanas[w].dias;
 
-    Object.keys(dias).forEach(d => {
-
+    Object.keys(dias).forEach((d) => {
       text += "\nDía " + d + "\n";
 
-      dias[d].ejercicios.forEach(ex => {
-
+      dias[d].ejercicios.forEach((ex) => {
         if (!ex.nombre) return;
 
         text += "• " + ex.nombre;
@@ -1016,52 +1341,42 @@ function generateRoutineText() {
         if (ex.peso) text += " | " + ex.peso + " kg";
 
         text += "\n";
-
       });
-
     });
 
     text += "\n";
-
   });
 
   return text;
-
 }
 
 function shareRoutineWhatsApp() {
-
   const text = generateRoutineText();
 
   const url = "https://wa.me/?text=" + encodeURIComponent(text);
 
   window.open(url, "_blank");
-
 }
-
 
 // --- RENDERING ---
 function renderTabs() {
+  const tabsContainer = document.getElementById("week-tabs");
 
-  const tabsContainer = document.getElementById('week-tabs');
-
-  tabsContainer.innerHTML = '';
+  tabsContainer.innerHTML = "";
 
   const semanas = Object.keys(state.rutina.semanas);
 
-  semanas.forEach(w => {
-
-    const btn = document.createElement('button');
+  semanas.forEach((w) => {
+    const btn = document.createElement("button");
 
     // 1. Asignamos la clase y el estado activo original (fundamental para CSS)
-    btn.className = `tab-btn ${state.currentWeek == w ? 'active' : ''}`;
+    btn.className = `tab-btn ${state.currentWeek == w ? "active" : ""}`;
 
     // 2. Insertamos el HTML con el nombre y la cruz roja
     btn.innerHTML = `SEMANA ${w} <span class="delete-week" onclick="deleteWeek(${w}, event)" title="Eliminar semana">✖</span>`;
 
     // 3. Abrimos correctamente el evento click para cambiar de pestaña
     btn.onclick = () => {
-
       state.currentWeek = parseInt(w);
 
       renderTabs();
@@ -1069,61 +1384,52 @@ function renderTabs() {
       renderApp();
 
       scrollActiveWeekIntoView();
-
     }; // Aquí cierra el onclick correctamente
 
     tabsContainer.appendChild(btn);
-
-
   });
 
   scrollActiveWeekIntoView();
-
 }
 
 function scrollActiveWeekIntoView() {
+  const container = document.getElementById("week-tabs");
 
-  const container = document.getElementById('week-tabs');
-
-  const active = container.querySelector('.tab-btn.active');
+  const active = container.querySelector(".tab-btn.active");
 
   if (!active) return;
 
   active.scrollIntoView({
-    behavior: 'smooth',
-    inline: 'center',
-    block: 'nearest'
+    behavior: "smooth",
+    inline: "center",
+    block: "nearest",
   });
-
 }
 
-
 function renderApp() {
+  const container = document.getElementById("days-accordion");
 
-  const container = document.getElementById('days-accordion');
-
-  const weekLabel = document.getElementById('current-week-label');
+  const weekLabel = document.getElementById("current-week-label");
 
   const weekData = state.rutina.semanas[state.currentWeek];
 
   weekLabel.textContent = `Semana ${state.currentWeek}`;
 
-  container.innerHTML = '';
+  container.innerHTML = "";
 
-  Object.keys(weekData.dias).forEach(dayId => {
-
+  Object.keys(weekData.dias).forEach((dayId) => {
     const dia = weekData.dias[dayId];
 
-    const dayCard = document.createElement('div');
+    const dayCard = document.createElement("div");
 
-    dayCard.className = 'day-card';
+    dayCard.className = "day-card";
 
     // guardar qué día es en el DOM
     dayCard.dataset.day = dayId;
 
     // no abrir siempre el día 1
     if (state.openDay == dayId) {
-      dayCard.classList.add('open');
+      dayCard.classList.add("open");
     }
 
     dayCard.innerHTML = `
@@ -1142,43 +1448,35 @@ function renderApp() {
             <button class="btn-add-ex" onclick="addExerciseField(${dayId})">+ Agregar Ejercicio</button>
         `;
 
-    const contentContainer = dayCard.querySelector('.day-content');
+    const contentContainer = dayCard.querySelector(".day-content");
 
     dia.ejercicios.forEach((ex, idx) => {
       contentContainer.appendChild(createExerciseRow(dayId, idx, ex));
     });
 
-    dayCard.querySelector('.day-header').onclick = () => {
-
-      document.querySelectorAll('.day-card').forEach(c => {
-        if (c !== dayCard) c.classList.remove('open');
+    dayCard.querySelector(".day-header").onclick = () => {
+      document.querySelectorAll(".day-card").forEach((c) => {
+        if (c !== dayCard) c.classList.remove("open");
       });
 
-      dayCard.classList.toggle('open');
+      dayCard.classList.toggle("open");
       state.openDay = dayId;
 
-      if (dayCard.classList.contains('open')) {
-        dayCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (dayCard.classList.contains("open")) {
+        dayCard.scrollIntoView({ behavior: "smooth", block: "start" });
       }
-
     };
 
     container.appendChild(dayCard);
-
   });
-
 }
 
-
-
-
 function createExerciseRow(dayId, index, exercise) {
+  const row = document.createElement("div");
 
-  const row = document.createElement('div');
-
-  row.className = 'exercise-row';
-  row.dataset.day = dayId;      // identifica el día
-  row.dataset.index = index;    // identifica el ejercicio dentro del día
+  row.className = "exercise-row";
+  row.dataset.day = dayId; // identifica el día
+  row.dataset.index = index; // identifica el ejercicio dentro del día
 
   const finalCatalog = getFinalCatalog();
 
@@ -1189,19 +1487,15 @@ function createExerciseRow(dayId, index, exercise) {
 `;
 
   for (const [grupo, items] of Object.entries(finalCatalog)) {
-
     optionsHtml += `<optgroup label="${grupo}">`;
 
-    items.forEach(item => {
-
-      const selected = (exercise.nombre === item) ? 'selected' : '';
+    items.forEach((item) => {
+      const selected = exercise.nombre === item ? "selected" : "";
 
       optionsHtml += `<option value="${item}" ${selected}>${item}</option>`;
-
     });
 
     optionsHtml += `</optgroup>`;
-
   }
 
   const exerciseLabel = exercise.nombre || "Seleccionar ejercicio...";
@@ -1285,27 +1579,19 @@ function createExerciseRow(dayId, index, exercise) {
     `;
 
   return row;
-
 }
 
-
-
-
 window.handleExerciseSelect = async (dayId, index, selectEl) => {
-
   const val = selectEl.value;
 
   if (val === "__ADD_SECTION__") {
-
     const ok = await addNewSectionFlow();
     selectEl.value = ""; // vuelve a “Seleccionar…”
     if (ok) renderApp();
     return;
-
   }
 
   if (val === "__ADD_EXERCISE__") {
-
     const created = await addNewExerciseFlow();
 
     selectEl.value = ""; // vuelve a “Seleccionar…”
@@ -1315,16 +1601,15 @@ window.handleExerciseSelect = async (dayId, index, selectEl) => {
     }
 
     return;
-
   }
 
   // Selección normal
   updateEx(dayId, index, "nombre", selectEl);
-
 };
 
 window.openRoutineExercisePicker = (dayId, index) => {
-  const exercise = state.rutina.semanas[state.currentWeek].dias[dayId].ejercicios[index];
+  const exercise =
+    state.rutina.semanas[state.currentWeek].dias[dayId].ejercicios[index];
 
   openExercisePicker({
     currentValue: exercise?.nombre || "",
@@ -1334,25 +1619,17 @@ window.openRoutineExercisePicker = (dayId, index) => {
       setExerciseName(dayId, index, exerciseName);
       renderApp();
       showAppToast("Ejercicio actualizado", "success");
-    }
+    },
   });
 };
 
-
-
-
-
-
-
-
 async function addNewSectionFlow() {
-
   let section = await showAppInput({
     title: "Crear sección",
     message: "Ingresá el nombre de la sección nueva.",
     placeholder: "Ej: PANTORRILLAS",
     confirmText: "Crear",
-    cancelText: "Cancelar"
+    cancelText: "Cancelar",
   });
 
   if (!section) return false;
@@ -1361,33 +1638,16 @@ async function addNewSectionFlow() {
 
   if (!section) return false;
 
-  section = section.toUpperCase();
-
-  const userCatalog = loadUserCatalog();
-
-  if (userCatalog[section]) {
-    showAppToast("Esa sección ya existe.", "warning");
-    return false;
-  }
-
-  userCatalog[section] = [];
-
-  saveUserCatalog(userCatalog);
-
-  showAppToast("Sección agregada", "success");
-
-  return true;
-
+  return Boolean(createUserCatalogSection(section));
 }
 
 async function addNewExerciseFlow() {
-
   let exName = await showAppInput({
     title: "Crear ejercicio",
     message: "Ingresá el nombre del ejercicio.",
     placeholder: "Ej: Buen día con barra",
     confirmText: "Crear",
-    cancelText: "Cancelar"
+    cancelText: "Cancelar",
   });
 
   if (!exName) return false;
@@ -1396,40 +1656,31 @@ async function addNewExerciseFlow() {
 
   if (!exName) return false;
 
-  // Elegir sección
-  const finalCatalog = getFinalCatalog();
-  const sections = Object.keys(finalCatalog);
-
-  let section = await showAppInput({
-    title: "Sección del ejercicio",
-    message: "Escribí el nombre exacto o uno nuevo. Ejemplos: " + sections.slice(0, 6).join(", "),
-    placeholder: "Ej: PANTORRILLAS",
-    confirmText: "Guardar",
-    cancelText: "Cancelar"
+  const section = await new Promise((resolve) => {
+    openSectionPicker({
+      allowCreate: true,
+      onSelect: (sectionName) => resolve(sectionName),
+      onCancel: () => resolve(null),
+    });
   });
 
   if (!section) return false;
 
-  section = section.trim();
-
-  if (!section) return false;
-
-  section = section.toUpperCase();
-
   // Guardar en catálogo de usuario
   const userCatalog = loadUserCatalog();
-
-  if (!userCatalog[section]) {
-    userCatalog[section] = [];
-  }
+  const finalCatalog = getFinalCatalog();
 
   // Evitar duplicados
   const alreadyExistsInFinal = (finalCatalog[section] || []).includes(exName);
-  const alreadyExistsInUser = userCatalog[section].includes(exName);
+  const alreadyExistsInUser = (userCatalog[section] || []).includes(exName);
 
   if (alreadyExistsInFinal || alreadyExistsInUser) {
     showAppToast("Ese ejercicio ya existe en esa sección.", "warning");
     return false;
+  }
+
+  if (!userCatalog[section]) {
+    userCatalog[section] = [];
   }
 
   userCatalog[section].push(exName);
@@ -1439,32 +1690,20 @@ async function addNewExerciseFlow() {
   showAppToast("Ejercicio agregado", "success");
 
   return true;
-
 }
-
-
-
-
-
-
-
 
 // --- ACTIONS ---
 window.updateEx = (dayId, idx, field, el) => {
-
   const value = el.value;
-  const exercise = state.rutina.semanas[state.currentWeek].dias[dayId].ejercicios[idx];
+  const exercise =
+    state.rutina.semanas[state.currentWeek].dias[dayId].ejercicios[idx];
 
-  if (field === 'nombre') {
-
+  if (field === "nombre") {
     exercise.nombre = value;
     const opt = el.options[el.selectedIndex];
     exercise.grupo = opt.parentElement.label || "";
-
   } else {
-
-    if (field === 'peso') {
-
+    if (field === "peso") {
       exercise[field] = value;
 
       const pesoMax = calculateMaxWeight(value);
@@ -1475,22 +1714,18 @@ window.updateEx = (dayId, idx, field, el) => {
       if (maxLabel) {
         maxLabel.textContent = pesoMax;
       }
-
     } else {
-
       exercise[field] = value;
-
     }
-
   }
 
   debouncedSave();
-
 };
 
 window.addExerciseField = (dayId) => {
-
-  state.rutina.semanas[state.currentWeek].dias[dayId].ejercicios.push(createExerciseObject());
+  state.rutina.semanas[state.currentWeek].dias[dayId].ejercicios.push(
+    createExerciseObject(),
+  );
 
   renderApp();
 
@@ -1499,22 +1734,20 @@ window.addExerciseField = (dayId) => {
   showAppToast("Ejercicio agregado", "success");
 
   setTimeout(() => {
-
     const content = document.getElementById(`day-content-${dayId}`);
 
     if (!content) return;
 
-    const rows = content.querySelectorAll('.exercise-row');
+    const rows = content.querySelectorAll(".exercise-row");
 
     if (rows.length === 0) return;
 
-    rows[rows.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
-
+    rows[rows.length - 1].scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
   }, 50);
-
 };
-
-
 
 // --- DATA PERSISTENCE ---
 function debouncedSave() {
@@ -1524,17 +1757,20 @@ function debouncedSave() {
 
 function saveToStorage(showTime = false) {
   state.rutina.meta.updatedAt = new Date().toISOString();
-  localStorage.setItem('gym_rutina_v1', JSON.stringify(state.rutina));
+  localStorage.setItem("gym_rutina_v1", JSON.stringify(state.rutina));
 
   if (showTime) {
     const now = new Date();
-    const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-    document.getElementById('last-saved').textContent = `Guardado: ${timeStr}`;
+    const timeStr =
+      now.getHours().toString().padStart(2, "0") +
+      ":" +
+      now.getMinutes().toString().padStart(2, "0");
+    document.getElementById("last-saved").textContent = `Guardado: ${timeStr}`;
   }
 }
 
 function loadFromStorage() {
-  const data = localStorage.getItem('gym_rutina_v1');
+  const data = localStorage.getItem("gym_rutina_v1");
   if (data) {
     try {
       state.rutina = JSON.parse(data);
@@ -1546,25 +1782,24 @@ function loadFromStorage() {
 
 // --- UI HELPERS & EVENTS ---
 function setupEventListeners() {
-
-
-  document.getElementById('btn-share-wa').textContent = "Generar PDF / WhatsApp";
-  document.getElementById('btn-share-wa').onclick = () => {
+  document.getElementById("btn-share-wa").textContent =
+    "Generar PDF / WhatsApp";
+  document.getElementById("btn-share-wa").onclick = () => {
     generarPDFRutina();
   };
 
-  document.getElementById('btn-reset-week').onclick = async () => {
+  document.getElementById("btn-reset-week").onclick = async () => {
     const ok = await showAppConfirm({
       title: "Reiniciar semana",
       message: "Se borrarán los datos cargados de esta semana.",
       confirmText: "Reiniciar",
       cancelText: "Cancelar",
-      tone: "warning"
+      tone: "warning",
     });
     if (!ok) return;
     const dias = state.rutina.semanas[state.currentWeek].dias;
-    Object.keys(dias).forEach(dia => {
-      dias[dia].ejercicios.forEach(ex => {
+    Object.keys(dias).forEach((dia) => {
+      dias[dia].ejercicios.forEach((ex) => {
         ex.series = "";
         ex.reps = "";
         ex.peso = "";
@@ -1575,8 +1810,7 @@ function setupEventListeners() {
     showAppToast("Semana reiniciada", "warning");
   };
 
-  document.getElementById('btn-duplicate-week').onclick = () => {
-
+  document.getElementById("btn-duplicate-week").onclick = () => {
     const semanaActual = state.currentWeek;
     const siguienteSemana = semanaActual + 1;
 
@@ -1588,23 +1822,19 @@ function setupEventListeners() {
 
     const nuevosDias = {};
 
-    Object.keys(diasActuales).forEach(dia => {
-
+    Object.keys(diasActuales).forEach((dia) => {
       nuevosDias[dia] = {
-        ejercicios: diasActuales[dia].ejercicios.map(ex => {
-
+        ejercicios: diasActuales[dia].ejercicios.map((ex) => {
           return {
             id: crypto.randomUUID(),
             nombre: ex.nombre,
             grupo: ex.grupo,
             series: ex.series,
             reps: ex.reps,
-            peso: ""
+            peso: "",
           };
-
-        })
+        }),
       };
-
     });
 
     state.rutina.semanas[siguienteSemana].dias = nuevosDias;
@@ -1613,29 +1843,27 @@ function setupEventListeners() {
 
     renderTabs();
     saveToStorage(true);
-
   };
 
-  document.getElementById('btn-add-day').onclick = () => {
-
+  document.getElementById("btn-add-day").onclick = () => {
     const dias = state.rutina.semanas[state.currentWeek].dias;
 
     const nuevoDia = Object.keys(dias).length + 1;
 
     dias[nuevoDia] = {
-      ejercicios: Array(DEFAULT_EX_PER_DAY).fill(0).map(() => createExerciseObject())
+      ejercicios: Array(DEFAULT_EX_PER_DAY)
+        .fill(0)
+        .map(() => createExerciseObject()),
     };
 
     renderApp();
     saveToStorage(true);
     showAppToast("Día agregado", "success");
-
   };
 
   /* ----------- NUEVO BLOQUE: AGREGAR SEMANA ----------- */
 
-  document.getElementById('btn-add-week').onclick = () => {
-
+  document.getElementById("btn-add-week").onclick = () => {
     const semanas = state.rutina.semanas;
 
     const nuevaSemana = Object.keys(semanas).length + 1;
@@ -1644,12 +1872,10 @@ function setupEventListeners() {
 
     const nuevosDias = {};
 
-    Object.keys(diasBase).forEach(dia => {
-
+    Object.keys(diasBase).forEach((dia) => {
       nuevosDias[dia] = {
-        ejercicios: diasBase[dia].ejercicios.map(() => createExerciseObject())
+        ejercicios: diasBase[dia].ejercicios.map(() => createExerciseObject()),
       };
-
     });
 
     semanas[nuevaSemana] = { dias: nuevosDias };
@@ -1660,24 +1886,20 @@ function setupEventListeners() {
     renderApp();
     saveToStorage(true);
     showAppToast("Semana agregada", "success");
-
   };
 
   /* ---------------------------------------------------- */
-
-
 }
 
 function calculateMaxWeight(pesoTexto) {
-
   if (!pesoTexto) return "";
 
   const numeros = pesoTexto
     .replace(/,/g, " ")
     .replace(/\//g, " ")
     .split(" ")
-    .map(n => parseFloat(n))
-    .filter(n => !isNaN(n));
+    .map((n) => parseFloat(n))
+    .filter((n) => !isNaN(n));
 
   if (numeros.length === 0) return "";
 
@@ -1686,55 +1908,13 @@ function calculateMaxWeight(pesoTexto) {
   return "máx: " + max + " kg";
 }
 
-
 function hapticTap() {
-
   if (!navigator.vibrate) return;
 
   navigator.vibrate(10);
-
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function updateDiasRestantes(serverUser = null) {
-
   if (actualizarDiasHeaderDesdeUsuario()) {
     return;
   }
@@ -1846,21 +2026,15 @@ function updateDiasRestantes(serverUser = null) {
     btnPlan.innerText = "💎 Activar PRO";
     btnPlan.style.display = "inline-block";
   }
-
 }
-
-
-
 
 // ---- BOTON PLAN PRO ----
 document.addEventListener("DOMContentLoaded", function () {
-
   const btnPlan = document.getElementById("btn-plan");
   const btnCerrar = document.getElementById("btn-cerrar-plan");
 
   if (btnPlan) {
     btnPlan.onclick = () => {
-
       const modal = document.getElementById("plan-modal");
 
       if (modal) {
@@ -1868,7 +2042,6 @@ document.addEventListener("DOMContentLoaded", function () {
         modal.style.display = "block";
         modal.dataset.locked = "false";
       }
-
     };
   }
 
@@ -1878,9 +2051,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("plan-modal").style.display = "none";
     };
   }
-
 });
-
 
 /* =========================================================
    BOTÓN: "YA TRANSFERÍ"
@@ -1897,7 +2068,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-transferido").onclick = async () => {
-
     /* -------------------------------------------------------
        1) OBTENER DATOS DEL USUARIO
        ------------------------------------------------------- */
@@ -1911,7 +2081,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const aliasCliente = aliasInput ? aliasInput.value.trim() : "";
     showPlanMessage("");
 
-
     /* -------------------------------------------------------
        2) VALIDACIONES BÁSICAS
        ------------------------------------------------------- */
@@ -1924,10 +2093,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // si el usuario no escribió el alias desde donde pagó
     if (!aliasCliente) {
-      showPlanMessage("Por favor escribí el alias desde donde hiciste la transferencia", "error");
+      showPlanMessage(
+        "Por favor escribí el alias desde donde hiciste la transferencia",
+        "error",
+      );
       return;
     }
-
 
     /* -------------------------------------------------------
        3) ENVIAR SOLICITUD A APPS SCRIPT
@@ -1937,17 +2108,18 @@ document.addEventListener("DOMContentLoaded", () => {
        ------------------------------------------------------- */
 
     try {
-
       const data = await appsScriptRequest("solicitarPago", {
         telefono: telefono,
         aliasCliente: aliasCliente,
         monto: 5000,
         planSolicitado: "PRO",
-        fechaSolicitudPago: new Date().toISOString()
+        fechaSolicitudPago: new Date().toISOString(),
       });
 
       if (data?.ok === true) {
-        showPlanMessage("Solicitud enviada correctamente. Revisaremos el pago y activaremos tu cuenta.");
+        showPlanMessage(
+          "Solicitud enviada correctamente. Revisaremos el pago y activaremos tu cuenta.",
+        );
         if (aliasInput) aliasInput.value = "";
 
         const whatsappOpened = await openAdminWhatsappForReceipt();
@@ -1962,32 +2134,23 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      showPlanMessage(data?.message || data?.error || "No se pudo registrar la solicitud", "error");
-
-    }
-
-
-    /* -------------------------------------------------------
+      showPlanMessage(
+        data?.message || data?.error || "No se pudo registrar la solicitud",
+        "error",
+      );
+    } catch (err) {
+      /* -------------------------------------------------------
         4) ERROR DE CONEXIÓN O EXCEPCIÓN
        ------------------------------------------------------- */
-
-    catch (err) {
 
       console.error(err);
 
       showPlanMessage(err?.message || "Error de conexión", "error");
-
     }
-
   };
 });
 
-
-
-
 // después del login exitoso
-
-
 
 function startUserAccessSync() {
   if (syncInterval) clearInterval(syncInterval);
@@ -1996,7 +2159,6 @@ function startUserAccessSync() {
 }
 
 async function consultarEstadoUsuario() {
-
   const telefono = localStorage.getItem("telefono");
   if (!telefono) {
     updateDiasRestantes();
@@ -2013,39 +2175,13 @@ async function consultarEstadoUsuario() {
 
     localStorage.setItem("usuario", JSON.stringify(data.usuario));
     actualizarDiasHeaderDesdeUsuario();
-
   } catch (err) {
-
     console.error("Error sync usuario:", err);
 
     // si falla el servidor seguimos con el usuario guardado localmente
     actualizarDiasHeaderDesdeUsuario();
-
   }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 async function generarPDFRutina() {
   const fileName = "rutina_gym.pdf";
@@ -2058,11 +2194,11 @@ async function generarPDFRutina() {
       throw new Error("jsPDF no disponible.");
     }
 
-  const doc = new jsPDF({
-    orientation: "landscape",
-    unit: "mm",
-    format: "a4"
-  });
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4",
+    });
 
     const semanas = state?.rutina?.semanas || {};
     const semKeys = Object.keys(semanas).sort((a, b) => Number(a) - Number(b));
@@ -2077,7 +2213,7 @@ async function generarPDFRutina() {
     const getEjercicios = (semanaKey, diaKey) => {
       const dia = getDia(semanaKey, diaKey);
       return Array.isArray(dia?.ejercicios)
-        ? dia.ejercicios.filter(e => e && typeof e === "object")
+        ? dia.ejercicios.filter((e) => e && typeof e === "object")
         : [];
     };
 
@@ -2091,113 +2227,114 @@ async function generarPDFRutina() {
       toText(exercise.nombre, "Ejercicio sin nombre"),
       toText(exercise.series, "-"),
       toText(exercise.reps, "-"),
-      toText(exercise.peso, "-")
+      toText(exercise.peso, "-"),
     ];
 
-  const chunks = [];
-  for (let i = 0; i < pdfSemanas.length; i += 4) {
-    chunks.push(pdfSemanas.slice(i, i + 4));
-  }
-
-  const pageWidth = doc.internal.pageSize.getWidth();
-  //espacio entre “Día” y la primera tabla está determinado por una sola variable: startX.
-  //const startX = 25; la tabla empieza en 25 mm probar const startX = 16;
-  const startX = 18;
-  const marginRight = 14;
-  const usableWidth = pageWidth - startX - marginRight;
-  const weekWidth = usableWidth / 4;
-  //ANCHO DE COLUMNAS
-  const colEjercicio = weekWidth * 0.5;
-  const colS = weekWidth * 0.08;
-  const colR = weekWidth * 0.17;
-  const colKg = weekWidth * 0.25;
-
-  chunks.forEach((chunk, chunkIndex) => {
-    if (chunkIndex > 0) {
-      doc.addPage();
+    const chunks = [];
+    for (let i = 0; i < pdfSemanas.length; i += 4) {
+      chunks.push(pdfSemanas.slice(i, i + 4));
     }
 
-    doc.setFontSize(18);
-    doc.text("Rutina de Entrenamiento", 14, 15);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    //espacio entre “Día” y la primera tabla está determinado por una sola variable: startX.
+    //const startX = 25; la tabla empieza en 25 mm probar const startX = 16;
+    const startX = 18;
+    const marginRight = 14;
+    const usableWidth = pageWidth - startX - marginRight;
+    const weekWidth = usableWidth / 4;
+    //ANCHO DE COLUMNAS
+    const colEjercicio = weekWidth * 0.5;
+    const colS = weekWidth * 0.08;
+    const colR = weekWidth * 0.17;
+    const colKg = weekWidth * 0.25;
 
-    let startY = 25;
-    //LETRA DE SEMANA
-    doc.setFontSize(9);
-    chunk.forEach((semana, index) => {
-      const tableX = startX + index * weekWidth;
-      doc.text("SEMANA " + semana, tableX, startY);
-    });
+    chunks.forEach((chunk, chunkIndex) => {
+      if (chunkIndex > 0) {
+        doc.addPage();
+      }
 
-    startY += 5;
-    const tablesStartY = startY;
+      doc.setFontSize(18);
+      doc.text("Rutina de Entrenamiento", 14, 15);
 
-    for (let dia = 1; dia <= 4; dia++) {
-      let maxFinalY = startY;
-      //LETRA DE DIA
+      let startY = 25;
+      //LETRA DE SEMANA
       doc.setFontSize(9);
-      //etiqueta del día
-      // doc.text("Día " + dia, 10, startY + 7); el texto está en 10 mm, dejando 15 mm de espacio.      
-      // probar doc.text("Día " + dia, 12, startY + 7); mas chico mueve "dia" mas a la izquierda
-      doc.text("Día " + dia, 8, startY + 7);
-
-      let maxEjercicios = 1;
-      chunk.forEach(semana => {
-        const ejercicios = getEjercicios(semana, dia);
-        if (ejercicios.length > maxEjercicios) {
-          maxEjercicios = ejercicios.length;
-        }
+      chunk.forEach((semana, index) => {
+        const tableX = startX + index * weekWidth;
+        doc.text("SEMANA " + semana, tableX, startY);
       });
 
-      chunk.forEach((semana, index) => {
-        const ejercicios = getEjercicios(semana, dia);
+      startY += 5;
+      const tablesStartY = startY;
 
-        let tabla = ejercicios.length > 0
-          ? ejercicios.map(toRow)
-          : [["Sin ejercicios cargados", "-", "-", "-"]];
+      for (let dia = 1; dia <= 4; dia++) {
+        let maxFinalY = startY;
+        //LETRA DE DIA
+        doc.setFontSize(9);
+        //etiqueta del día
+        // doc.text("Día " + dia, 10, startY + 7); el texto está en 10 mm, dejando 15 mm de espacio.
+        // probar doc.text("Día " + dia, 12, startY + 7); mas chico mueve "dia" mas a la izquierda
+        doc.text("Día " + dia, 8, startY + 7);
 
-        while (tabla.length < maxEjercicios) {
-          tabla.push(["", "", "", ""]);
-        }
-
-        const tableX = startX + index * weekWidth;
-
-        doc.autoTable({
-          startY: startY,
-          margin: { left: tableX },
-          head: [['Ejercicio', 'S', 'R', 'Kg']],
-          body: tabla,
-          theme: 'grid',
-          tableWidth: weekWidth,
-          styles: {
-            fontSize: 7,
-            cellPadding: 0.5,
-            valign: 'middle',
-            overflow: 'visible'
-          },
-          columnStyles: {
-            0: { cellWidth: colEjercicio },
-            1: { cellWidth: colS, halign: 'center' },
-            2: { cellWidth: colR, halign: 'center' },
-            3: { cellWidth: colKg, halign: 'center' }
+        let maxEjercicios = 1;
+        chunk.forEach((semana) => {
+          const ejercicios = getEjercicios(semana, dia);
+          if (ejercicios.length > maxEjercicios) {
+            maxEjercicios = ejercicios.length;
           }
         });
 
-        if (doc.lastAutoTable?.finalY > maxFinalY) {
-          maxFinalY = doc.lastAutoTable.finalY;
-        }
-      });
+        chunk.forEach((semana, index) => {
+          const ejercicios = getEjercicios(semana, dia);
 
-      startY = maxFinalY + 5;
-    }
+          let tabla =
+            ejercicios.length > 0
+              ? ejercicios.map(toRow)
+              : [["Sin ejercicios cargados", "-", "-", "-"]];
 
-    doc.setLineWidth(0.8);
-    doc.setDrawColor(0, 150, 120); // verde similar al header
+          while (tabla.length < maxEjercicios) {
+            tabla.push(["", "", "", ""]);
+          }
 
-    for (let i = 1; i < chunk.length; i++) {
-      const lineX = startX + i * weekWidth;
-      doc.line(lineX, tablesStartY, lineX, startY - 5);
-    }
-  });
+          const tableX = startX + index * weekWidth;
+
+          doc.autoTable({
+            startY: startY,
+            margin: { left: tableX },
+            head: [["Ejercicio", "S", "R", "Kg"]],
+            body: tabla,
+            theme: "grid",
+            tableWidth: weekWidth,
+            styles: {
+              fontSize: 7,
+              cellPadding: 0.5,
+              valign: "middle",
+              overflow: "visible",
+            },
+            columnStyles: {
+              0: { cellWidth: colEjercicio },
+              1: { cellWidth: colS, halign: "center" },
+              2: { cellWidth: colR, halign: "center" },
+              3: { cellWidth: colKg, halign: "center" },
+            },
+          });
+
+          if (doc.lastAutoTable?.finalY > maxFinalY) {
+            maxFinalY = doc.lastAutoTable.finalY;
+          }
+        });
+
+        startY = maxFinalY + 5;
+      }
+
+      doc.setLineWidth(0.8);
+      doc.setDrawColor(0, 150, 120); // verde similar al header
+
+      for (let i = 1; i < chunk.length; i++) {
+        const lineX = startX + i * weekWidth;
+        doc.line(lineX, tablesStartY, lineX, startY - 5);
+      }
+    });
 
     const blob = doc.output("blob");
     try {
@@ -2205,7 +2342,10 @@ async function generarPDFRutina() {
     } catch (modalError) {
       console.error("Error mostrando modal PDF", modalError);
       downloadPdfBlob(blob, fileName);
-      showAppToast("PDF descargado. Adjuntalo manualmente en WhatsApp.", "warning");
+      showAppToast(
+        "PDF descargado. Adjuntalo manualmente en WhatsApp.",
+        "warning",
+      );
     }
   } catch (error) {
     console.error("Error generando PDF", error);
@@ -2213,28 +2353,17 @@ async function generarPDFRutina() {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
 /* ================================================= */
 /* ELIMINAR EJERCICIO                                */
 /* ================================================= */
 
 async function deleteExercise(dayId, index, btn) {
-
   const ok = await showAppConfirm({
     title: "Eliminar ejercicio",
     message: "Se eliminará este ejercicio de la rutina.",
     confirmText: "Eliminar",
     cancelText: "Cancelar",
-    tone: "danger"
+    tone: "danger",
   });
   if (!ok) return;
 
@@ -2248,11 +2377,9 @@ async function deleteExercise(dayId, index, btn) {
   saveToStorage(true);
 
   // eliminar solo la fila del DOM
-  const row = btn.closest('.exercise-row');
+  const row = btn.closest(".exercise-row");
   if (row) row.remove();
-
 }
-
 
 /* ================================================= */
 /* ELIMINAR DIA                                */
@@ -2266,8 +2393,8 @@ window.deleteDay = (dayId, event) => {
     message: "Se eliminará este día y todos sus ejercicios. ¿Confirmás?",
     confirmText: "Eliminar",
     cancelText: "Cancelar",
-    tone: "danger"
-  }).then(ok => {
+    tone: "danger",
+  }).then((ok) => {
     if (!ok) return;
 
     const dias = state.rutina.semanas[state.currentWeek].dias;
@@ -2291,7 +2418,6 @@ window.deleteDay = (dayId, event) => {
   });
 };
 
-
 /* ================================================= */
 /* ELIMINAR SEMANA                                   */
 /* ================================================= */
@@ -2312,8 +2438,8 @@ window.deleteWeek = (weekId, event) => {
     message: "Esta acción eliminará la semana completa. ¿Confirmás?",
     confirmText: "Eliminar",
     cancelText: "Cancelar",
-    tone: "danger"
-  }).then(ok => {
+    tone: "danger",
+  }).then((ok) => {
     if (!ok) return;
 
     // 1. Eliminar la semana del objeto global
@@ -2336,23 +2462,11 @@ window.deleteWeek = (weekId, event) => {
   });
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
 /* ========================================================= */
 /* MÓDULO CONTROL DE PESO CORPORAL                           */
 /* ========================================================= */
 
-const WEIGHT_STORAGE_KEY = 'gym_weight_log_v1';
+const WEIGHT_STORAGE_KEY = "gym_weight_log_v1";
 let weightLog = [];
 let isWeightModuleInitialized = false; // <-- GUARD PARA EVITAR DUPLICACIÓN
 
@@ -2376,55 +2490,78 @@ function saveWeightLog() {
   localStorage.setItem(WEIGHT_STORAGE_KEY, JSON.stringify(weightLog));
 }
 
+function clearAppStorageKeys(storage) {
+  if (!storage) return;
 
+  Object.keys(storage).forEach((key) => {
+    if (key.startsWith("gym_")) {
+      storage.removeItem(key);
+    }
+  });
+}
 
+async function handleResetLocalData() {
+  const ok = await showAppConfirm({
+    title: "Borrar datos locales",
+    message:
+      "Todos los datos cargados en este dispositivo —rutinas, ejercicios creados, secciones, peso corporal y progreso— serán borrados completamente. Esta acción no elimina tu cuenta ni tus pagos.\n\n¿Seguro querés continuar?",
+    confirmText: "Sí, quiero borrar",
+    cancelText: "No, cancelar",
+    tone: "danger",
+  });
 
+  if (!ok) return;
 
+  clearAppStorageKeys(localStorage);
+  clearAppStorageKeys(sessionStorage);
 
+  showAppToast("Datos locales borrados", "success");
 
+  setTimeout(() => {
+    window.location.reload();
+  }, 800);
+}
 
 /* ========================================================= */
 /* MENÚ PRINCIPAL NAVEGACIÓN                                 */
 /* ========================================================= */
 function initMainMenu() {
-  const btnMenu = document.getElementById('btn-main-menu');
-  const overlay = document.getElementById('main-menu-overlay');
-  const btnClose = document.getElementById('btn-close-menu');
-  const btnProgress = document.getElementById('btn-progress-module');
-  const btnWeight = document.getElementById('btn-weight-module');
+  const btnMenu = document.getElementById("btn-main-menu");
+  const overlay = document.getElementById("main-menu-overlay");
+  const btnClose = document.getElementById("btn-close-menu");
+  const btnProgress = document.getElementById("btn-progress-module");
+  const btnWeight = document.getElementById("btn-weight-module");
+  const btnResetLocalData = document.getElementById("btn-reset-local-data");
   if (btnMenu && overlay && btnClose) {
     // Abrir menú principal
-    btnMenu.addEventListener('click', () => {
-      overlay.style.display = 'flex';
+    btnMenu.addEventListener("click", () => {
+      overlay.style.display = "flex";
     });
     // Cerrar menú con la cruz
-    btnClose.addEventListener('click', () => {
-      overlay.style.display = 'none';
+    btnClose.addEventListener("click", () => {
+      overlay.style.display = "none";
     });
     // Cerrar si tocan fuera del menú
-    overlay.addEventListener('click', (e) => {
+    overlay.addEventListener("click", (e) => {
       if (e.target === overlay) {
-        overlay.style.display = 'none';
+        overlay.style.display = "none";
       }
     });
     // Cerrar menú si pulsan en "Peso Corporal" (para dejar que actúe su propio evento)
     if (btnWeight) {
-      btnWeight.addEventListener('click', () => {
-        overlay.style.display = 'none';
+      btnWeight.addEventListener("click", () => {
+        overlay.style.display = "none";
+      });
+    }
+
+    if (btnResetLocalData) {
+      btnResetLocalData.addEventListener("click", () => {
+        overlay.style.display = "none";
+        handleResetLocalData();
       });
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
 
 function initWeightModule() {
   // Si ya se agregaron los listeners previamente, abortamos silenciosamente
@@ -2433,50 +2570,49 @@ function initWeightModule() {
   loadWeightLog();
 
   // Asignar fecha de hoy al input por defecto
-  const dateInput = document.getElementById('weight-date');
+  const dateInput = document.getElementById("weight-date");
   if (dateInput) {
     const today = new Date();
     const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
     dateInput.value = `${yyyy}-${mm}-${dd}`;
   }
 
-  const btnOpen = document.getElementById('btn-weight-module');
-  const btnClose = document.getElementById('btn-close-weight');
-  const appContainer = document.getElementById('app-container');
-  const weightContainer = document.getElementById('weight-container');
+  const btnOpen = document.getElementById("btn-weight-module");
+  const btnClose = document.getElementById("btn-close-weight");
+  const appContainer = document.getElementById("app-container");
+  const weightContainer = document.getElementById("weight-container");
 
   // Transiciones de vistas (se registran UNA SOLA VEZ)
   if (btnOpen && btnClose && appContainer && weightContainer) {
-    btnOpen.addEventListener('click', () => {
-      appContainer.style.display = 'none';
-      weightContainer.style.display = 'flex';
+    btnOpen.addEventListener("click", () => {
+      appContainer.style.display = "none";
+      weightContainer.style.display = "flex";
       renderWeightModule();
     });
 
-    btnClose.addEventListener('click', () => {
-      appContainer.style.display = 'block';
-      weightContainer.style.display = 'none';
+    btnClose.addEventListener("click", () => {
+      appContainer.style.display = "block";
+      weightContainer.style.display = "none";
     });
   }
 
-  const btnAdd = document.getElementById('btn-add-weight');
+  const btnAdd = document.getElementById("btn-add-weight");
   if (btnAdd) {
-    btnAdd.addEventListener('click', addWeightRecord);
+    btnAdd.addEventListener("click", addWeightRecord);
   }
 
   // Sellamos la inicialización para futuras llamadas de init()
   isWeightModuleInitialized = true;
 }
 
-
 function addWeightRecord() {
-  const dateInput = document.getElementById('weight-date');
-  const valueInput = document.getElementById('weight-value');
+  const dateInput = document.getElementById("weight-date");
+  const valueInput = document.getElementById("weight-value");
 
   const date = dateInput.value;
-  const valueStr = valueInput.value.replace(',', '.'); // Tolerancia a comas
+  const valueStr = valueInput.value.replace(",", "."); // Tolerancia a comas
   const value = parseFloat(valueStr);
 
   if (!date) {
@@ -2489,7 +2625,7 @@ function addWeightRecord() {
   }
 
   // Sobrescribir si hay registro mismo día, de lo contrario agregar
-  const existingIndex = weightLog.findIndex(w => w.date === date);
+  const existingIndex = weightLog.findIndex((w) => w.date === date);
   if (existingIndex >= 0) {
     weightLog[existingIndex].weight = value;
   } else {
@@ -2509,10 +2645,10 @@ window.deleteWeightRecord = async function (date) {
     message: "Se borrará este registro de peso corporal.",
     confirmText: "Eliminar",
     cancelText: "Cancelar",
-    tone: "danger"
+    tone: "danger",
   });
   if (!ok) return;
-  weightLog = weightLog.filter(w => w.date !== date);
+  weightLog = weightLog.filter((w) => w.date !== date);
   saveWeightLog();
   renderWeightModule();
 };
@@ -2526,7 +2662,7 @@ function renderWeightModule() {
 /* TABLA DE REGISTROS (Render)                               */
 /* ========================================================= */
 function renderWeightTable() {
-  const tbody = document.getElementById('weight-table-body');
+  const tbody = document.getElementById("weight-table-body");
   if (!tbody) return;
 
   tbody.innerHTML = "";
@@ -2535,15 +2671,16 @@ function renderWeightTable() {
   const reversedLog = [...weightLog].reverse();
 
   if (reversedLog.length === 0) {
-    tbody.innerHTML = "<tr><td colspan='3' style='text-align:center; padding: 24px 0; color: #8e8e93;'>Aún no hay registros cargados</td></tr>";
+    tbody.innerHTML =
+      "<tr><td colspan='3' style='text-align:center; padding: 24px 0; color: #8e8e93;'>Aún no hay registros cargados</td></tr>";
     return;
   }
 
-  reversedLog.forEach(record => {
+  reversedLog.forEach((record) => {
     const parts = record.date.split("-");
     const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
 
-    const tr = document.createElement('tr');
+    const tr = document.createElement("tr");
     tr.innerHTML = `
             <td>${formattedDate}</td>
             <td style="color: var(--primary);">${record.weight.toFixed(1)}</td>
@@ -2559,10 +2696,10 @@ function renderWeightTable() {
 /* GRÁFICO DE EVOLUCIÓN (Native HTML5 Canvas)                */
 /* ========================================================= */
 function renderWeightChart() {
-  const canvas = document.getElementById('weight-chart');
+  const canvas = document.getElementById("weight-chart");
   if (!canvas) return;
 
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
   const width = canvas.width;
   const height = canvas.height;
 
@@ -2573,7 +2710,11 @@ function renderWeightChart() {
     ctx.fillStyle = "#8e8e93";
     ctx.font = "13px -apple-system, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("Agregá al menos 2 registros para ver el gráfico", width / 2, height / 2);
+    ctx.fillText(
+      "Agregá al menos 2 registros para ver el gráfico",
+      width / 2,
+      height / 2,
+    );
     return;
   }
 
@@ -2581,7 +2722,7 @@ function renderWeightChart() {
   const chartW = width - padding * 2;
   const chartH = height - padding * 2;
 
-  const weights = weightLog.map(w => w.weight);
+  const weights = weightLog.map((w) => w.weight);
   const minW = Math.min(...weights) - 1.5; // Margen dinámico inferior
   const maxW = Math.max(...weights) + 1.5; // Margen dinámico superior
   const range = maxW - minW;
@@ -2606,7 +2747,7 @@ function renderWeightChart() {
   weightLog.forEach((record, idx) => {
     const x = padding + (idx / (weightLog.length - 1)) * chartW;
     const normalizedY = (record.weight - minW) / range;
-    const y = height - padding - (normalizedY * chartH);
+    const y = height - padding - normalizedY * chartH;
 
     if (idx === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
@@ -2621,7 +2762,7 @@ function renderWeightChart() {
   weightLog.forEach((record, idx) => {
     const x = padding + (idx / (weightLog.length - 1)) * chartW;
     const normalizedY = (record.weight - minW) / range;
-    const y = height - padding - (normalizedY * chartH);
+    const y = height - padding - normalizedY * chartH;
 
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, 2 * Math.PI);
@@ -2629,8 +2770,6 @@ function renderWeightChart() {
     ctx.stroke();
   });
 }
-
-
 
 /* ===================================================== */
 /* MÓDULO: PROGRESO DE EJERCICIOS                        */
@@ -2671,7 +2810,7 @@ function ensureProgressCustomSelectors() {
         onSelect: (exerciseName) => {
           formSelect.value = exerciseName;
           syncProgressExerciseButtons();
-        }
+        },
       });
     });
     formSelect.insertAdjacentElement("afterend", button);
@@ -2683,7 +2822,9 @@ function ensureProgressCustomSelectors() {
     button.type = "button";
     button.className = "progress-exercise-picker-btn";
     button.addEventListener("click", () => {
-      const exercisesWithRecords = [...new Set(progressData.map(r => r.exercise).filter(Boolean))].sort();
+      const exercisesWithRecords = [
+        ...new Set(progressData.map((r) => r.exercise).filter(Boolean)),
+      ].sort();
 
       openExercisePicker({
         currentValue: filterSelect.value,
@@ -2694,7 +2835,7 @@ function ensureProgressCustomSelectors() {
           filterSelect.value = exerciseName;
           syncProgressExerciseButtons();
           renderProgressUI();
-        }
+        },
       });
     });
     filterSelect.insertAdjacentElement("afterend", button);
@@ -2722,8 +2863,8 @@ function initProgressModule() {
       const hoy = new Date();
       // Formato YYYY-MM-DD local
       const offset = hoy.getTimezoneOffset() * 60000;
-      const localISOTime = (new Date(hoy - offset)).toISOString().split('T')[0];
-      document.getElementById('progress-date').value = localISOTime;
+      const localISOTime = new Date(hoy - offset).toISOString().split("T")[0];
+      document.getElementById("progress-date").value = localISOTime;
 
       loadExerciseSelects();
       ensureProgressCustomSelectors();
@@ -2745,8 +2886,6 @@ function initProgressModule() {
     filterSelect.addEventListener("change", renderProgressUI);
   }
 }
-
-
 
 /* Persistencia de Progreso */
 function loadProgressData() {
@@ -2780,7 +2919,7 @@ function handleAddProgress() {
     id: Date.now() + Math.random().toString(36),
     date: dateInput,
     exercise: exInput,
-    weight: parseFloat(valInput)
+    weight: parseFloat(valInput),
   };
 
   progressData.push(newRecord);
@@ -2806,11 +2945,11 @@ window.deleteProgressRecord = async (id) => {
     message: "Se eliminará este registro de progreso.",
     confirmText: "Eliminar",
     cancelText: "Cancelar",
-    tone: "danger"
+    tone: "danger",
   });
   if (!ok) return;
 
-  progressData = progressData.filter(r => r.id !== id);
+  progressData = progressData.filter((r) => r.id !== id);
   saveProgressData();
 
   const filterSelect = document.getElementById("progress-filter-select");
@@ -2821,8 +2960,6 @@ window.deleteProgressRecord = async (id) => {
 
   renderProgressUI();
 };
-
-
 
 /* Carga de ejercicios disponibles en Catálogo */
 function loadExerciseSelects() {
@@ -2840,7 +2977,7 @@ function loadExerciseSelects() {
   // Usamos el mismo recorrido por catalogos que existe en createExerciseRow
   for (const [grupo, items] of Object.entries(catalog)) {
     optionsHtml += `<optgroup label="${grupo}">`;
-    items.forEach(item => {
+    items.forEach((item) => {
       optionsHtml += `<option value="${item}">${item}</option>`;
     });
     optionsHtml += `</optgroup>`;
@@ -2850,19 +2987,22 @@ function loadExerciseSelects() {
   selectForm.value = prevFormVal; // Restaurar si había algo
 
   // Para el filtro extraemos solo los que tienen AL MENOS 1 registro
-  const ejerciciosConRegistros = [...new Set(progressData.map(r => r.exercise))].sort();
+  const ejerciciosConRegistros = [
+    ...new Set(progressData.map((r) => r.exercise)),
+  ].sort();
 
   let filterHtml = '<option value="">Todos los registros</option>';
-  ejerciciosConRegistros.forEach(ex => {
+  ejerciciosConRegistros.forEach((ex) => {
     filterHtml += `<option value="${ex}">${ex}</option>`;
   });
 
   selectFilter.innerHTML = filterHtml;
-  selectFilter.value = ejerciciosConRegistros.includes(prevFilterVal) ? prevFilterVal : "";
+  selectFilter.value = ejerciciosConRegistros.includes(prevFilterVal)
+    ? prevFilterVal
+    : "";
 
   ensureProgressCustomSelectors();
 }
-
 
 /* Render principal de UI (Tabla + Grafico) */
 function renderProgressUI() {
@@ -2872,17 +3012,20 @@ function renderProgressUI() {
   // Filtrar
   let filteredData = progressData;
   if (filterVal) {
-    filteredData = progressData.filter(r => r.exercise === filterVal);
+    filteredData = progressData.filter((r) => r.exercise === filterVal);
   }
 
   // Ordenar descendente (más nuevo arriba) para tabla
-  const sortedDesc = [...filteredData].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const sortedDesc = [...filteredData].sort(
+    (a, b) => new Date(b.date) - new Date(a.date),
+  );
 
   tbody.innerHTML = "";
-  sortedDesc.forEach(record => {
+  sortedDesc.forEach((record) => {
     // Formatear Fecha DD/MM
     const partes = record.date.split("-");
-    const labelFecha = partes.length === 3 ? `${partes[2]}/${partes[1]}` : record.date;
+    const labelFecha =
+      partes.length === 3 ? `${partes[2]}/${partes[1]}` : record.date;
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -2899,8 +3042,6 @@ function renderProgressUI() {
   // Renderizar Gráfica solo con los datos filtrados
   renderProgressChart(filteredData, filterVal);
 }
-
-
 
 /* Renderizado Gráfica de Progreso de línea Vanilla JS */
 function renderProgressChart(data, filterName) {
@@ -2929,16 +3070,18 @@ function renderProgressChart(data, filterName) {
   }
 
   // Ordenar ascendente para la gráfica (más viejo a izquierda, nuevo a derecha)
-  const sortedAsc = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const sortedAsc = [...data].sort(
+    (a, b) => new Date(a.date) - new Date(b.date),
+  );
 
-  const pesos = sortedAsc.map(r => r.weight);
+  const pesos = sortedAsc.map((r) => r.weight);
   const minW = Math.min(...pesos);
   const maxW = Math.max(...pesos);
 
   const padY = 25;
   const padX = 25;
-  const chartW = w - (padX * 2);
-  const chartH = h - (padY * 2);
+  const chartW = w - padX * 2;
+  const chartH = h - padY * 2;
   let range = maxW - minW;
   if (range === 0) range = 10; // Si todos los pesos son iguales, forzar rango visual
 
@@ -2952,8 +3095,8 @@ function renderProgressChart(data, filterName) {
     const fracX = i / (sortedAsc.length - 1);
     const fracY = (pt.weight - minW) / range;
 
-    const x = padX + (fracX * chartW);
-    const y = h - padY - (fracY * chartH);
+    const x = padX + fracX * chartW;
+    const y = h - padY - fracY * chartH;
 
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
@@ -2969,8 +3112,8 @@ function renderProgressChart(data, filterName) {
     const fracX = i / (sortedAsc.length - 1);
     const fracY = (pt.weight - minW) / range;
 
-    const x = padX + (fracX * chartW);
-    const y = h - padY - (fracY * chartH);
+    const x = padX + fracX * chartW;
+    const y = h - padY - fracY * chartH;
 
     // Punto
     ctx.beginPath();
@@ -2984,8 +3127,6 @@ function renderProgressChart(data, filterName) {
   });
 }
 
-
-
 // =================================================
 // LÓGICA MODO TESTER 2 DÍAS (Restricción por Frontend)
 // =================================================
@@ -2994,7 +3135,7 @@ function verificarModoTester() {
     return;
   }
 
-  const TESTER_KEY = 'gym_tester_start_v1';
+  const TESTER_KEY = "gym_tester_start_v1";
   const MAX_DAYS = 2; // Días de prueba
   const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -3013,30 +3154,27 @@ function verificarModoTester() {
 
   // 2. Verificamos si expiró la restricción local
   if (diffDays >= MAX_DAYS) {
-    document.getElementById('app-container').style.display = 'none';
-    document.getElementById('tester-lock-screen').style.display = 'flex';
+    document.getElementById("app-container").style.display = "none";
+    document.getElementById("tester-lock-screen").style.display = "flex";
   } else {
-    document.getElementById('app-container').style.display = 'block';
+    document.getElementById("app-container").style.display = "block";
 
     // 3. Cálculo simple en días redondeados hacia arriba
-    const msRestantes = (MAX_DAYS * MS_PER_DAY) - diffMs;
+    const msRestantes = MAX_DAYS * MS_PER_DAY - diffMs;
     const diasRestantes = Math.ceil(msRestantes / MS_PER_DAY);
 
-    const textoDias = diasRestantes > 1
-      ? `Faltan ${diasRestantes} días para bloqueo`
-      : `Falta 1 día para bloqueo`;
+    const textoDias =
+      diasRestantes > 1
+        ? `Faltan ${diasRestantes} días para bloqueo`
+        : `Falta 1 día para bloqueo`;
 
     // 4. Actualizamos exclusivamente el span manteniendo intacto todo lo del PRO
-    const spanDias = document.getElementById('dias-restantes');
+    const spanDias = document.getElementById("dias-restantes");
     if (spanDias) {
       spanDias.innerHTML = `<span style="color:#ff3b30;">${textoDias}</span>`;
     }
   }
 }
-
-
-
-
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./service-worker.js");
