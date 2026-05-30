@@ -586,6 +586,16 @@ header {
     background: var(--border);
 }
 
+.menu-item-danger {
+    color: var(--danger);
+    background: rgba(255, 59, 48, 0.08);
+    border-color: rgba(255, 59, 48, 0.22);
+}
+
+.menu-item-danger:active {
+    background: rgba(255, 59, 48, 0.16);
+}
+
 @keyframes slideUpMenu {
     from {
         transform: translateY(100%);
@@ -1437,6 +1447,17 @@ body {
     font-size: 0.9rem;
     font-weight: 700;
     text-align: center;
+}
+
+.exercise-picker-empty-inline {
+    margin-top: 7px;
+    padding: 10px 12px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    background: #f9f9fb;
+    color: var(--text-muted);
+    font-size: 0.86rem;
+    font-weight: 700;
 }
 
 @media (min-width: 768px) {
