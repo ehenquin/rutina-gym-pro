@@ -845,11 +845,16 @@ function getLoginBlockMessage(user, data) {
   return "";
 }
 
-function enterAppAfterLogin(user) {
-  localStorage.removeItem("licencia_exp");
-  localStorage.removeItem("plan");
-  localStorage.removeItem("gym_tester_start_v1");
-  localStorage.removeItem("session_token");
+function enterAppAfterLogin(user, options = {}) {
+  const { preserveSession = false } = options;
+  const storedSessionToken = localStorage.getItem("session_token");
+
+  if (!preserveSession) {
+    localStorage.removeItem("licencia_exp");
+    localStorage.removeItem("plan");
+    localStorage.removeItem("gym_tester_start_v1");
+    localStorage.removeItem("session_token");
+  }
 
   localStorage.setItem("usuario", JSON.stringify(user));
 
@@ -857,6 +862,9 @@ function enterAppAfterLogin(user) {
   if (user?.session_token)
     localStorage.setItem("session_token", user.session_token);
   if (user?.token) localStorage.setItem("session_token", user.token);
+  if (preserveSession && storedSessionToken && !user?.session_token && !user?.token) {
+    localStorage.setItem("session_token", storedSessionToken);
+  }
 
   const loginScreen = document.getElementById("login-screen");
   const appContainer = document.getElementById("app-container");
@@ -867,6 +875,76 @@ function enterAppAfterLogin(user) {
   actualizarDiasHeaderDesdeUsuario();
   updateMembershipChip(user);
   init();
+}
+
+function isLocalUserStillAllowed(usuario) {
+  if (!usuario || Object.keys(usuario).length === 0) return false;
+
+  const estado = normalizeAuthValue(getUsuarioField(usuario, ["Estado", "estado"]));
+  const pago = normalizeAuthValue(getUsuarioField(usuario, ["Pago", "pago"]));
+  const acceso = getUsuarioField(usuario, ["acceso", "Acceso"]);
+  const fechaRaw = getUsuarioField(usuario, [
+    "FechaVencimiento",
+    "fechaVencimiento",
+    "fecha_vencimiento",
+    "expira",
+  ]);
+  const fecha = parseFechaUsuario(fechaRaw);
+  const vigente = !fecha || fecha.getTime() > Date.now();
+
+  if (acceso === false || acceso === "false") return false;
+  if (estado === "BLOQUEADO" || estado === "VENCIDO" || estado === "PENDIENTE") {
+    return false;
+  }
+
+  if (estado === "ACTIVO") {
+    return (pago === "SI" || pago === "SÍ") && vigente;
+  }
+
+  if (estado === "PRUEBA") {
+    return Boolean(fecha && fecha.getTime() > Date.now());
+  }
+
+  return false;
+}
+
+async function tryAutoLogin() {
+  const usuario = getStoredUsuario();
+  const telefono =
+    usuario?.telefono || localStorage.getItem("telefono") || "";
+
+  if (!telefono || !usuario || Object.keys(usuario).length === 0) return;
+
+  showAuthMessage("Verificando sesión...");
+
+  try {
+    const data = await appsScriptRequest("checkAccess", { telefono });
+    const serverUser = data?.usuario;
+    const blockMessage = getLoginBlockMessage(serverUser || usuario, data);
+
+    if (!data?.ok || !serverUser || blockMessage) {
+      showAuthMessage(
+        blockMessage || "Tu acceso no está habilitado. Iniciá sesión nuevamente.",
+        true,
+      );
+      return;
+    }
+
+    enterAppAfterLogin(serverUser, { preserveSession: true });
+  } catch (error) {
+    console.error("Error autologin:", error);
+
+    if (isLocalUserStillAllowed(usuario)) {
+      enterAppAfterLogin(usuario, { preserveSession: true });
+      showAppToast("Ingresaste con los datos guardados en este dispositivo.", "info");
+      return;
+    }
+
+    showAuthMessage(
+      "No se pudo validar tu sesión. Iniciá sesión nuevamente cuando tengas conexión.",
+      true,
+    );
+  }
 }
 
 async function handleAppsScriptLogin() {
@@ -985,6 +1063,7 @@ function setupAppsScriptAuth() {
 
 document.addEventListener("DOMContentLoaded", () => {
   setupAppsScriptAuth();
+  tryAutoLogin();
 });
 // --- CONFIGURATION ---
 const APP_VERSION = "1.0.0";
@@ -1407,9 +1486,13 @@ let state = {
 };
 
 let saveTimeout = null;
+let isAppInitialized = false;
 
 // --- INITIALIZATION ---
 function init() {
+  if (isAppInitialized) return;
+  isAppInitialized = true;
+
   loadFromStorage();
 
   if (
@@ -2701,6 +2784,39 @@ async function handleResetLocalData() {
   }, 800);
 }
 
+async function logoutUser() {
+  const ok = await showAppConfirm({
+    title: "Cerrar sesión",
+    message:
+      "Vas a cerrar tu sesión en este dispositivo. Tus rutinas y datos locales no se borrarán.",
+    confirmText: "Cerrar sesión",
+    cancelText: "Cancelar",
+    tone: "warning",
+  });
+
+  if (!ok) return;
+
+  const sessionKeys = [
+    "usuario",
+    "telefono",
+    "session_token",
+    "plan",
+    "licencia_exp",
+    "gym_tester_start_v1",
+  ];
+
+  sessionKeys.forEach((key) => {
+    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
+  });
+
+  showAppToast("Sesión cerrada", "success");
+
+  setTimeout(() => {
+    window.location.reload();
+  }, 500);
+}
+
 /* ========================================================= */
 /* MENÚ PRINCIPAL NAVEGACIÓN                                 */
 /* ========================================================= */
@@ -2711,6 +2827,7 @@ function initMainMenu() {
   const btnProgress = document.getElementById("btn-progress-module");
   const btnWeight = document.getElementById("btn-weight-module");
   const btnContactAdmin = document.getElementById("btn-contact-admin");
+  const btnLogout = document.getElementById("btn-logout");
   const btnResetLocalData = document.getElementById("btn-reset-local-data");
   if (btnMenu && overlay && btnClose) {
     // Abrir menú principal
@@ -2745,6 +2862,13 @@ function initMainMenu() {
       btnContactAdmin.addEventListener("click", () => {
         overlay.style.display = "none";
         contactAdminWhatsapp();
+      });
+    }
+
+    if (btnLogout) {
+      btnLogout.addEventListener("click", () => {
+        overlay.style.display = "none";
+        logoutUser();
       });
     }
   }
