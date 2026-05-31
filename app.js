@@ -248,6 +248,20 @@ function downloadPdfBlob(pdfBlob, fileName) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+function getCurrentUserWhatsappNumber() {
+  const usuario = getStoredUsuario();
+  const rawPhone = usuario?.telefono || localStorage.getItem("telefono") || "";
+  let phone = String(rawPhone).replace(/\D/g, "");
+
+  if (!phone) return "";
+
+  if (!phone.startsWith("54")) {
+    phone = "54" + phone;
+  }
+
+  return phone;
+}
+
 function showPdfReadyModal({ pdfBlob, fileName }) {
   return new Promise((resolve) => {
     const overlay = document.createElement("div");
@@ -255,11 +269,10 @@ function showPdfReadyModal({ pdfBlob, fileName }) {
     overlay.innerHTML = `
       <div class="app-modal app-pdf-modal" role="dialog" aria-modal="true" aria-labelledby="app-pdf-modal-title">
         <h2 id="app-pdf-modal-title">PDF generado</h2>
-        <p>Descargá el archivo y adjuntalo manualmente en WhatsApp o Telegram.</p>
+        <p>Descargá el archivo y adjuntalo manualmente en tu WhatsApp.</p>
         <div class="app-modal-actions app-pdf-modal-actions">
           <button type="button" class="app-modal-btn primary" data-action="download">Descargar PDF</button>
-          <button type="button" class="app-modal-btn success" data-action="whatsapp">Abrir WhatsApp Web</button>
-          <button type="button" class="app-modal-btn primary" data-action="telegram">Abrir Telegram Web</button>
+          <button type="button" class="app-modal-btn success" data-action="whatsapp">Enviar a mi WhatsApp</button>
           <button type="button" class="app-modal-btn cancel" data-action="close">Cerrar</button>
         </div>
       </div>
@@ -280,16 +293,17 @@ function showPdfReadyModal({ pdfBlob, fileName }) {
     overlay
       .querySelector('[data-action="whatsapp"]')
       .addEventListener("click", () => {
-        downloadPdfBlob(pdfBlob, fileName);
-        window.open("https://web.whatsapp.com/", "_blank", "noopener");
-        showAppToast("Adjuntá manualmente el PDF descargado.", "info");
-      });
+        const phone = getCurrentUserWhatsappNumber();
+        if (!phone) {
+          showAppToast("No se encontró tu teléfono.", "warning");
+          return;
+        }
 
-    overlay
-      .querySelector('[data-action="telegram"]')
-      .addEventListener("click", () => {
         downloadPdfBlob(pdfBlob, fileName);
-        window.open("https://web.telegram.org/", "_blank", "noopener");
+        const message = encodeURIComponent(
+          "Me envío mi rutina en PDF. Adjunto el archivo descargado.",
+        );
+        window.open(`https://wa.me/${phone}?text=${message}`, "_blank", "noopener");
         showAppToast("Adjuntá manualmente el PDF descargado.", "info");
       });
 
@@ -428,8 +442,125 @@ function calcularDiasRestantes(fecha) {
   return Math.ceil(diffMs / DAY_MS);
 }
 
+function getRemainingMembershipTime(fecha) {
+  if (!fecha || isNaN(fecha.getTime())) {
+    return { expired: false, label: "Activo", days: null, hours: null };
+  }
+
+  const diffMs = fecha.getTime() - Date.now();
+  if (diffMs <= 0) {
+    return { expired: true, label: "Renovar", days: 0, hours: 0 };
+  }
+
+  const hours = Math.ceil(diffMs / (1000 * 60 * 60));
+  if (hours < 24) {
+    return { expired: false, label: `${hours} h`, days: 0, hours };
+  }
+
+  const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  return {
+    expired: false,
+    label: days === 1 ? "1 día" : `${days} días`,
+    days,
+    hours,
+  };
+}
+
+function setMembershipChip(topText, bottomText, stateClass, title) {
+  const chip = document.getElementById("btn-plan");
+  if (!chip) return;
+
+  const classes = [
+    "pro-ok",
+    "pro-warning",
+    "pro-orange",
+    "pro-danger",
+    "pro-expired",
+    "trial",
+    "pending",
+    "blocked",
+    "neutral",
+  ];
+
+  chip.classList.add("membership-chip");
+  chip.classList.remove(...classes);
+  chip.classList.add(stateClass || "neutral");
+  chip.innerHTML = `
+    <span class="membership-chip-main">${escapeHtml(topText)}</span>
+    <span class="membership-chip-sub">${escapeHtml(bottomText)}</span>
+  `;
+  chip.title = title || `${topText} ${bottomText}`;
+  chip.setAttribute("aria-label", chip.title);
+}
+
+function updateMembershipChip(usuarioOverride = null) {
+  const usuario = usuarioOverride || getStoredUsuario();
+
+  if (!usuario || Object.keys(usuario).length === 0) {
+    setMembershipChip("ACTIVAR", "PRO", "neutral", "Activar Plan PRO");
+    return;
+  }
+
+  const estado = normalizeAuthValue(getUsuarioField(usuario, ["Estado", "estado"]));
+  const pago = normalizeAuthValue(getUsuarioField(usuario, ["Pago", "pago"]));
+  const fechaVencimientoRaw = getUsuarioField(usuario, [
+    "FechaVencimiento",
+    "fechaVencimiento",
+    "fecha_vencimiento",
+    "expira",
+  ]);
+  const fechaVencimiento = parseFechaUsuario(fechaVencimientoRaw);
+  const remaining = getRemainingMembershipTime(fechaVencimiento);
+  const pagoSi = pago === "SI" || pago === "SÍ";
+
+  if (estado === "BLOQUEADO" || estado.includes("BLOQUEADO")) {
+    setMembershipChip("BLOQUEADO", "Cuenta", "blocked", "Cuenta bloqueada");
+    return;
+  }
+
+  if (estado === "PENDIENTE" || estado.includes("PENDIENTE") || pago === "PENDIENTE" || pago.includes("PENDIENTE")) {
+    setMembershipChip("PENDIENTE", "Cuenta", "pending", "Cuenta pendiente");
+    return;
+  }
+
+  if (estado === "PRUEBA") {
+    if (remaining.expired) {
+      setMembershipChip("PRUEBA", "Vencida", "pro-expired", "Prueba vencida");
+      return;
+    }
+
+    setMembershipChip("PRUEBA", remaining.label, "trial", "Periodo de prueba");
+    return;
+  }
+
+  if (estado === "VENCIDO" || estado.includes("VENCIDO") || (estado === "ACTIVO" && pagoSi && remaining.expired)) {
+    setMembershipChip("VENCIDO", "Renovar", "pro-expired", "Renovar Plan PRO");
+    return;
+  }
+
+  if (estado === "ACTIVO" && pagoSi) {
+    if (remaining.days !== null && remaining.days <= 5) {
+      let tone = "pro-warning";
+      if (remaining.hours < 24 || remaining.days <= 2) {
+        tone = "pro-danger";
+      } else if (remaining.days <= 4) {
+        tone = "pro-orange";
+      }
+
+      setMembershipChip("RENOVAR", remaining.label, tone, "Renovar Plan PRO");
+      return;
+    }
+
+    setMembershipChip("PRO", remaining.label, "pro-ok", "Plan PRO activo");
+    return;
+  }
+
+  setMembershipChip("ACTIVAR", "PRO", "neutral", "Activar Plan PRO");
+}
+
 function actualizarDiasHeaderDesdeUsuario() {
   const usuario = getStoredUsuario();
+  updateMembershipChip(usuario);
   if (!usuario || Object.keys(usuario).length === 0) return false;
 
   const el = document.getElementById("dias-restantes");
@@ -598,6 +729,49 @@ async function openAdminWhatsappForReceipt() {
   return true;
 }
 
+function getContactUserLabel(usuario) {
+  const alias =
+    usuario?.AliasCliente ||
+    usuario?.aliasCliente ||
+    usuario?.alias ||
+    "";
+  if (alias) return String(alias).trim();
+
+  const nombre = usuario?.nombre || usuario?.Nombre || "";
+  const apellido = usuario?.apellido || usuario?.Apellido || "";
+  const nombreCompleto = `${nombre} ${apellido}`.trim();
+
+  return nombreCompleto || "sin identificar";
+}
+
+async function contactAdminWhatsapp() {
+  try {
+    const data = await appsScriptRequest("obtenerTelefonoAdmin", {});
+    const telefonoAdmin = normalizeAdminWhatsappNumber(data?.telefonoAdmin);
+
+    if (data?.ok !== true || !telefonoAdmin) {
+      showAppToast("No se encontró el teléfono del administrador.", "warning");
+      return;
+    }
+
+    const usuario = getStoredUsuario();
+    const userLabel = getContactUserLabel(usuario);
+    const userPhone =
+      usuario?.telefono || localStorage.getItem("telefono") || "sin identificar";
+    const mensaje =
+      "Hola Admin, me contacto con vos porque tengo el siguiente problema:\n\n" +
+      `Mi usuario es: ${userLabel}\n` +
+      `Mi teléfono es: ${userPhone || "sin identificar"}`;
+    const url =
+      "https://wa.me/" + telefonoAdmin + "?text=" + encodeURIComponent(mensaje);
+
+    window.open(url, "_blank", "noopener");
+  } catch (error) {
+    console.error("Error obteniendo teléfono del administrador", error);
+    showAppToast("No se encontró el teléfono del administrador.", "warning");
+  }
+}
+
 function getLoginBlockMessage(user, data) {
   const apiMessage = data?.motivo || data?.message || data?.error;
   const estado = normalizeAuthValue(user?.estado || data?.estado);
@@ -691,6 +865,7 @@ function enterAppAfterLogin(user) {
   if (appContainer) appContainer.style.display = "block";
 
   actualizarDiasHeaderDesdeUsuario();
+  updateMembershipChip(user);
   init();
 }
 
@@ -1975,7 +2150,7 @@ function updateDiasRestantes(serverUser = null) {
     desbloquearApp();
 
     if (btnPlan) {
-      btnPlan.innerText = "💎 Activar PRO";
+      updateMembershipChip();
       btnPlan.style.display = "inline-block";
     }
 
@@ -1991,7 +2166,7 @@ function updateDiasRestantes(serverUser = null) {
     el.style.color = "#d11";
 
     if (btnPlan) {
-      btnPlan.innerText = "💎 Activar PRO";
+      updateMembershipChip();
       btnPlan.style.display = "inline-block";
     }
 
@@ -2004,7 +2179,7 @@ function updateDiasRestantes(serverUser = null) {
     el.style.color = "#0a8f4b";
 
     if (btnPlan) {
-      btnPlan.innerText = "💎 Plan PRO activo";
+      updateMembershipChip();
       btnPlan.style.display = "inline-block";
     }
 
@@ -2023,7 +2198,7 @@ function updateDiasRestantes(serverUser = null) {
   }
 
   if (btnPlan) {
-    btnPlan.innerText = "💎 Activar PRO";
+    updateMembershipChip();
     btnPlan.style.display = "inline-block";
   }
 }
@@ -2032,6 +2207,8 @@ function updateDiasRestantes(serverUser = null) {
 document.addEventListener("DOMContentLoaded", function () {
   const btnPlan = document.getElementById("btn-plan");
   const btnCerrar = document.getElementById("btn-cerrar-plan");
+
+  updateMembershipChip();
 
   if (btnPlan) {
     btnPlan.onclick = () => {
@@ -2175,11 +2352,13 @@ async function consultarEstadoUsuario() {
 
     localStorage.setItem("usuario", JSON.stringify(data.usuario));
     actualizarDiasHeaderDesdeUsuario();
+    updateMembershipChip(data.usuario);
   } catch (err) {
     console.error("Error sync usuario:", err);
 
     // si falla el servidor seguimos con el usuario guardado localmente
     actualizarDiasHeaderDesdeUsuario();
+    updateMembershipChip();
   }
 }
 
@@ -2531,6 +2710,7 @@ function initMainMenu() {
   const btnClose = document.getElementById("btn-close-menu");
   const btnProgress = document.getElementById("btn-progress-module");
   const btnWeight = document.getElementById("btn-weight-module");
+  const btnContactAdmin = document.getElementById("btn-contact-admin");
   const btnResetLocalData = document.getElementById("btn-reset-local-data");
   if (btnMenu && overlay && btnClose) {
     // Abrir menú principal
@@ -2558,6 +2738,13 @@ function initMainMenu() {
       btnResetLocalData.addEventListener("click", () => {
         overlay.style.display = "none";
         handleResetLocalData();
+      });
+    }
+
+    if (btnContactAdmin) {
+      btnContactAdmin.addEventListener("click", () => {
+        overlay.style.display = "none";
+        contactAdminWhatsapp();
       });
     }
   }
