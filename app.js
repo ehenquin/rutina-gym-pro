@@ -4,6 +4,11 @@
  */
 
 let syncInterval = null;
+let membershipWatcherInterval = null;
+let isMembershipWatcherStarted = false;
+let isMembershipCheckRunning = false;
+let membershipLockHideTimeout = null;
+const MEMBERSHIP_CHECK_INTERVAL_MS = 10 * 60 * 1000;
 
 async function testAppsScriptConnection() {
   if (!isAppsScriptConfigured()) return;
@@ -875,6 +880,7 @@ function enterAppAfterLogin(user, options = {}) {
   actualizarDiasHeaderDesdeUsuario();
   updateMembershipChip(user);
   init();
+  startMembershipWatcher();
 }
 
 function isLocalUserStillAllowed(usuario) {
@@ -2412,37 +2418,235 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // después del login exitoso
 
-function startUserAccessSync() {
-  if (syncInterval) clearInterval(syncInterval);
-  consultarEstadoUsuario();
-  syncInterval = setInterval(consultarEstadoUsuario, 15000);
+function getMembershipAccessState(usuario, data = {}) {
+  const estado = normalizeAuthValue(
+    getUsuarioField(usuario, ["Estado", "estado"]) || data?.estado,
+  );
+  const pago = normalizeAuthValue(
+    getUsuarioField(usuario, ["Pago", "pago"]) || data?.pago,
+  );
+  const fechaRaw =
+    getUsuarioField(usuario, [
+      "FechaVencimiento",
+      "fechaVencimiento",
+      "fecha_vencimiento",
+      "expira",
+    ]) ||
+    data?.fechaVencimiento ||
+    data?.fecha_vencimiento ||
+    data?.expira;
+  const fecha = parseFechaUsuario(fechaRaw);
+  const vigente = !fecha || fecha.getTime() > Date.now();
+  const pruebaVigente = Boolean(fecha && fecha.getTime() > Date.now());
+  const pagoSi = pago === "SI" || pago === "SÍ";
+  const apiMessage = normalizeAuthValue(
+    data?.motivo || data?.message || data?.error,
+  );
+
+  if (
+    estado === "BLOQUEADO" ||
+    estado.includes("BLOQUEADO") ||
+    apiMessage.includes("BLOQUEADO")
+  ) {
+    return "BLOQUEADO";
+  }
+
+  if (
+    estado === "PENDIENTE" ||
+    estado.includes("PENDIENTE") ||
+    pago === "PENDIENTE" ||
+    pago.includes("PENDIENTE") ||
+    apiMessage.includes("PENDIENTE")
+  ) {
+    return "PENDIENTE";
+  }
+
+  if (
+    estado === "VENCIDO" ||
+    estado.includes("VENCIDO") ||
+    apiMessage.includes("VENCIDO") ||
+    (estado === "ACTIVO" && pagoSi && !vigente) ||
+    (estado === "PRUEBA" && !pruebaVigente)
+  ) {
+    return "VENCIDO";
+  }
+
+  if (
+    (estado === "ACTIVO" && pagoSi && vigente) ||
+    (estado === "PRUEBA" && pruebaVigente)
+  ) {
+    return "ACTIVO";
+  }
+
+  return "";
 }
 
-async function consultarEstadoUsuario() {
-  const telefono = localStorage.getItem("telefono");
-  if (!telefono) {
-    updateDiasRestantes();
-    return;
+function showMembershipLockModal(accessState) {
+  const state = ["VENCIDO", "BLOQUEADO", "PENDIENTE"].includes(accessState)
+    ? accessState
+    : "VENCIDO";
+  let overlay = document.getElementById("membership-lock-modal");
+
+  if (membershipLockHideTimeout) {
+    clearTimeout(membershipLockHideTimeout);
+    membershipLockHideTimeout = null;
   }
+
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "membership-lock-modal";
+    overlay.className = "membership-lock-overlay";
+    document.body.appendChild(overlay);
+  }
+
+  const content = {
+    VENCIDO: {
+      title: "Tu membresía venció",
+      message: "Para seguir utilizando Rutina Gym\nnecesitás renovar tu acceso.",
+    },
+    BLOQUEADO: {
+      title: "Cuenta bloqueada",
+      message: "Tu cuenta fue bloqueada.\nContactate con el administrador.",
+    },
+    PENDIENTE: {
+      title: "Pago pendiente de aprobación",
+      message: "Tu comprobante fue recibido.\nEstamos verificando el pago.",
+    },
+  }[state];
+
+  overlay.dataset.state = state;
+  overlay.innerHTML = `
+    <div class="membership-lock-card" role="dialog" aria-modal="true" aria-labelledby="membership-lock-title">
+      <h2 id="membership-lock-title">${escapeHtml(content.title)}</h2>
+      <p>${escapeHtml(content.message)}</p>
+      ${
+        state === "VENCIDO"
+          ? `
+            <h3>$5000 / mes</h3>
+            <p>Alias para transferencia</p>
+            <div class="alias-box">rutina.gym.pro</div>
+          `
+          : ""
+      }
+      <div class="membership-lock-actions">
+        ${
+          state === "VENCIDO"
+            ? `<button type="button" class="membership-lock-btn success" data-action="receipt">Ya transferí y te mando comprobante</button>`
+            : ""
+        }
+        <button type="button" class="membership-lock-btn primary" data-action="contact">Contactar administrador</button>
+        <button type="button" class="membership-lock-btn neutral" data-action="logout">Cerrar sesión</button>
+      </div>
+    </div>
+  `;
+
+  overlay
+    .querySelector('[data-action="receipt"]')
+    ?.addEventListener("click", async () => {
+      try {
+        const opened = await openAdminWhatsappForReceipt();
+        if (!opened) {
+          showAppToast("No se encontró el teléfono del administrador.", "warning");
+        }
+      } catch (error) {
+        console.error("Error abriendo WhatsApp para comprobante", error);
+        showAppToast("No se encontró el teléfono del administrador.", "warning");
+      }
+    });
+  overlay
+    .querySelector('[data-action="contact"]')
+    .addEventListener("click", contactAdminWhatsapp);
+  overlay
+    .querySelector('[data-action="logout"]')
+    .addEventListener("click", performLogout);
+
+  document.body.classList.add("membership-locked");
+  requestAnimationFrame(() => overlay.classList.add("is-visible"));
+}
+
+function hideMembershipLockModal() {
+  const overlay = document.getElementById("membership-lock-modal");
+  document.body.classList.remove("membership-locked");
+  if (!overlay) return;
+
+  if (membershipLockHideTimeout) {
+    clearTimeout(membershipLockHideTimeout);
+  }
+
+  overlay.classList.remove("is-visible");
+  membershipLockHideTimeout = setTimeout(() => {
+    overlay.remove();
+    membershipLockHideTimeout = null;
+  }, 160);
+}
+
+async function checkMembershipStatus() {
+  if (isMembershipCheckRunning) return;
+
+  const telefono = localStorage.getItem("telefono");
+  if (!telefono) return;
+
+  isMembershipCheckRunning = true;
 
   try {
     const data = await appsScriptRequest("checkAccess", { telefono });
+    const storedUser = getStoredUsuario();
+    const serverUser = data?.usuario;
+    const usuario = serverUser || { ...storedUser, ...data };
+    const accessState = getMembershipAccessState(usuario, data);
 
-    if (!data?.ok || !data?.usuario) {
-      updateDiasRestantes();
+    if (!accessState) {
+      console.warn("Respuesta de membresía sin estado reconocido", data);
       return;
     }
 
-    localStorage.setItem("usuario", JSON.stringify(data.usuario));
+    localStorage.setItem("usuario", JSON.stringify(usuario));
     actualizarDiasHeaderDesdeUsuario();
-    updateMembershipChip(data.usuario);
-  } catch (err) {
-    console.error("Error sync usuario:", err);
+    updateMembershipChip(usuario);
 
-    // si falla el servidor seguimos con el usuario guardado localmente
+    if (accessState === "ACTIVO") {
+      hideMembershipLockModal();
+      return;
+    }
+
+    showMembershipLockModal(accessState);
+  } catch (err) {
+    console.error("Error validando membresía:", err);
+
+    // Un error de red no modifica el estado de acceso ya conocido.
     actualizarDiasHeaderDesdeUsuario();
     updateMembershipChip();
+  } finally {
+    isMembershipCheckRunning = false;
   }
+}
+
+function startMembershipWatcher() {
+  if (isMembershipWatcherStarted) {
+    checkMembershipStatus();
+    return;
+  }
+
+  isMembershipWatcherStarted = true;
+  checkMembershipStatus();
+  membershipWatcherInterval = setInterval(
+    checkMembershipStatus,
+    MEMBERSHIP_CHECK_INTERVAL_MS,
+  );
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") checkMembershipStatus();
+  });
+  window.addEventListener("focus", checkMembershipStatus);
+}
+
+function startUserAccessSync() {
+  if (syncInterval) clearInterval(syncInterval);
+  startMembershipWatcher();
+}
+
+async function consultarEstadoUsuario() {
+  return checkMembershipStatus();
 }
 
 async function generarPDFRutina() {
@@ -2795,6 +2999,12 @@ async function logoutUser() {
   });
 
   if (!ok) return;
+
+  performLogout();
+}
+
+function performLogout() {
+  hideMembershipLockModal();
 
   const sessionKeys = [
     "usuario",
